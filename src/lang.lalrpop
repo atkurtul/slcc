@@ -1,0 +1,179 @@
+use crate::expr::*;
+use crate::*;
+
+grammar;
+
+pub xLang =  {
+ FunctionDef*
+}
+
+#[inline]
+InParamDef = {
+  <Ident> ":" <Type>,
+  "mut" <Ident> ":" <BaseType>,
+  "mut" <Ident> ":" <Pointer>,
+}
+
+FunctionDef = {
+  "kernel"? "fn" <Ident> "(" <List<InParamDef>> ")" <("->" "(" <List<(<Ident> ":" <Type>)>> ")")?> "{"  <Statement*> "}"
+}
+
+Declspec = {
+  "pub",
+  "const",
+}
+
+Statement: Statement<'input> = {
+  "{" <mut v: Statement*> "}" => {
+    let sz = v.len();
+    match sz {
+      0 => Statement::Void,
+      1 => v.pop().unwrap(),
+      _ => Statement::Block(v),
+    }
+  },
+  <Expr> ";" => Statement::Expr(<>),
+  <Expr> "=" <Composite> ";" => Statement::Assign(<>),
+  <Declspec?> <Type> <Ident> "=" <Composite> ";" => Statement::Decl(<>),
+  "if" "(" <Expr> ")"  "{" <Statement*> "}" <("else" "{" <Statement*> "}" )?> => Statement::If(<>),
+  "while" "(" <Expr> ")" "{" <Statement*> "}" => Statement::While(<>),
+  "for" "(" <Expr?> ";" <Expr?> ";" <Expr?>  ")" "{" <Statement*> "}" => Statement::For(<>),
+}
+
+#[inline]
+List<T> : Vec<T> = <mut v:(<T> ",")*> <u:T?> => {
+  if let Some(u) = u {
+    v.push(u);
+  }
+  v
+};
+
+
+Composite = {
+  <Expr>,
+  "[" <List<Expr>> "]"  => Expr::List(<>),
+}
+
+Expr = {
+  <Assign>,
+}
+
+Atom: Expr<'input> = {
+  <Ident> => Expr::Ident(<>),
+  <Literal>,
+  "(" <Expr> ")",
+}
+
+Postfix : Expr<'input> = {
+  <Atom>,
+  <P<Postfix>> "(" <List<Expr>> ")" => Expr::Call(<>),
+  <P<Postfix>> "["  <P<Expr>> "]" => Expr::Subscript(<>),
+  <P<Postfix>> "." <Ident> => Expr::Access(<>),
+}
+
+Unop: Expr<'input> = {
+  <Postfix>,
+  <"&">  <P<Unop>> => Expr::Unop(<>),
+  <"*">  <P<Unop>> => Expr::Unop(<>),
+  <"-">  <P<Unop>> => Expr::Unop(<>),
+  <"+">  <P<Unop>> => Expr::Unop(<>),
+  <"!">  <P<Unop>> => Expr::Unop(<>),
+  <"++"> <P<Unop>> => Expr::Unop(<>),
+  <"--"> <P<Unop>> => Expr::Unop(<>),
+}
+
+P<T> : Box<T> = T => Box::new(<>);
+V<T> : Vec<T> = T => vec![<>];
+
+Binop<Prev, Op>: Expr<'input> = {
+  <Prev>,
+  <P<Binop<Prev, Op>>> <Op> <P<Prev>> => Expr::Binop(<>),
+}
+
+Mulop = { "*", "/", "%"}
+Addop = { "+", "-"}
+Shlr = { "<<", ">>" }
+Relop = {  "<", "<=", ">", ">="}
+Equop = {  "==", "!=" }
+Assignop = { "+=", "-=", "*=", "/=", "%=" }
+
+LogAndop = { "&&" }
+LogOrop = { "||" }
+
+Mul = Binop<Unop, Mulop>;
+Add = Binop<Mul, Addop>;
+Shift = Binop<Add, Shlr>;
+Rel = Binop<Shift, Relop>;
+Equ = Binop<Rel, Equop>;
+BitAnd = Binop<Equ, "&">;
+BitXor = Binop<BitAnd, "^">;
+BitOr = Binop<BitXor, "|">;
+LogAnd = Binop<BitOr, LogAndop>;
+LogOr = Binop<LogAnd, LogOrop>;
+Assign = Binop<LogOr, Assignop>;
+
+
+Literal : Expr<'input> = {
+  <r"\d+">      => Expr::Uint(<>.parse().unwrap()),
+  <r"\d+\.\d+"> => Expr::Float(<>.parse().unwrap()),
+}
+
+
+Pointer: Type<'input> = {
+  "[" <P<BaseType>> "]" => Type::Ptr(<>, StorageClass::Function()),
+  "[" <P<Pointer>> "]"  => Type::Ptr(<>, StorageClass::Function()),
+  "[" <P<Struct>> "]"   => Type::Ptr(<>, StorageClass::Function()),
+}
+
+OpaqueType: Type<'input> = {
+  "image"   => Type::Base(BaseType::Image),
+  "image2d" => Type::Base(BaseType::Image2D),
+  "image3d" => Type::Base(BaseType::Image3D),
+}
+
+BaseType: Type<'input> = {
+  "int"  => Type::Base(BaseType::Int),
+  "uint" => Type::Base(BaseType::Uint),
+  "float" => Type::Base(BaseType::Float),
+  "int2" => Type::Base(BaseType:: Int2),
+  "uint2" => Type::Base(BaseType::Uint2),
+  "float2" => Type::Base(BaseType::Float2),
+  "int3" => Type::Base(BaseType:: Int3),
+  "uint3" => Type::Base(BaseType::Uint3),
+  "float3" => Type::Base(BaseType::Float3),
+  "int4" => Type::Base(BaseType:: Int4),
+  "uint4" => Type::Base(BaseType::Uint4),
+  "float4" => Type::Base(BaseType::Float4),
+}
+
+Struct : Type<'input> = Ident => Type::Struct(<>);
+
+Type: Type<'input> = {
+  BaseType,
+  OpaqueType,
+  Pointer,
+  Struct,
+}
+
+match {
+  r"#.*\n" => {},
+  r"\s" => {},
+  "const",
+  "pub",
+  "kernel", "fn", "mut",  "if", "else", "while", "for",
+  "*" ,"/", "%", "+", "-" ,"!" ,"++","--",
+  "&&", "||", "|", "&", "^", "=", "+=", "-=", "*=", "/=", "%=",
+  "<<", ">>", "<", "<=", ">", ">=", "==", "!=",
+  ".", ":", ",", ";", "->",
+  "[", "]",
+  "{", "}",
+  "(", ")",
+  "int",  "uint",  "float",
+  "int2", "uint2", "float2",
+  "int3", "uint3", "float3",
+  "int4", "uint4", "float4",
+  "image","image2d", "image3d",
+  r"\d+\.\d+",
+  r"\d+",
+  r"[a-zA-Z]\w*" => Ident,
+}
