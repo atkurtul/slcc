@@ -41,8 +41,8 @@ fn main() {
     let ast = parser.parse(&src).unwrap();
     let mut ctx = Context::new();
 
-    for (name, args, out, stats) in ast {
-        ctx.create_func(name, args, out, stats);
+    for (kernel, name, args, out, stats) in ast {
+        ctx.create_func(kernel.unwrap_or((1, 1, 1)), name, args, out, stats);
     }
 
     let module = ctx.into_module();

@@ -25,7 +25,6 @@ pub enum Expr<'a> {
 pub enum Statement<'a> {
     Expr(Expr<'a>),
     Decl(Option<&'a str>, Type<'a>, &'a str, Expr<'a>),
-    Assign(Expr<'a>, Expr<'a>),
     If(Expr<'a>, Vec<Statement<'a>>, Option<Vec<Statement<'a>>>),
     Block(Vec<Statement<'a>>),
     Void,
@@ -48,11 +47,7 @@ impl<'a> Statement<'a> {
                 let expr = ctx.load_if(expr);
                 ctx.create_variable(ty, name, StorageClass::Function(), Some(expr));
             }
-            Statement::Assign(l, r) => {
-                let l = l.lower(ctx);
-                let r = r.lower_decl(l.2.get_pointee(), ctx);
-                ctx.assign(l, r);
-            }
+
             Statement::Block(block) => {
                 ctx.push();
                 for stat in block {
@@ -85,7 +80,8 @@ impl<'a> Statement<'a> {
                 ctx.set_label(con_label);
 
                 let c = if let Some(con) = con {
-                    con.lower(ctx).1
+                    let c = con.lower(ctx);
+                    ctx.load_if(c).1
                 } else {
                     ctx.get_bool(true)
                 };
@@ -111,6 +107,10 @@ impl<'a> Statement<'a> {
 
                 let c = c.lower(ctx);
                 let (_, c, _) = ctx.load_if(c);
+                ctx.add_instr(Opcode::SelectionMerge(
+                    r_label.id.into(),
+                    SelectionControl::None(),
+                ));
                 ctx.branch(c, t_label.id, r_label.id);
                 ctx.set_label(t_label);
                 for stat in t {
@@ -276,7 +276,7 @@ pub struct Field<'a> {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Struct<'a> {
-    name: &'a str,
+    name: String,
     fields: HashMap<&'a str, Field<'a>>,
     id: TypeID,
 }
@@ -318,6 +318,17 @@ impl IDGenerator {
 pub struct Label {
     id: ResultID,
     instr: Vec<Opcode>,
+}
+
+impl BaseType {
+    fn get_size(self) -> u32 {
+        let (w, n) = type_attr(self);
+        if w == 3 {
+            n as u32
+        } else {
+            n as u32 * 4
+        }
+    }
 }
 
 impl<'a> Type<'a> {
@@ -401,26 +412,26 @@ impl LabelStack {
 
 pub struct Function<'a> {
     id: ResultID,
+    local_size: (u32, u32, u32),
     name: &'a str,
     labels: LabelStack,
     scope_stack: Vec<usize>,
     scopes: Vec<Scope<'a>>,
     variable_instr: Vec<Opcode>,
-    builtins: HashMap<&'a str, ResultID>,
-    decorations: Vec<Opcode>,
+    interface: Vec<ID>,
 }
 
 impl<'a> Function<'a> {
-    pub fn new(id: ResultID, name: &'a str) -> Self {
+    pub fn new(id: ResultID, local_size: (u32, u32, u32), name: &'a str) -> Self {
         Self {
             id,
+            local_size,
             name,
             labels: LabelStack::new(),
             scope_stack: Vec::new(),
             scopes: Vec::new(),
+            interface: Vec::new(),
             variable_instr: Vec::new(),
-            decorations: Vec::new(),
-            builtins: HashMap::new(),
         }
     }
 
@@ -457,7 +468,6 @@ impl<'a> Function<'a> {
 
     pub fn write_to_module(self, module: &mut Module) {
         let mut labels = self.labels;
-
         labels.prepend(1, self.variable_instr);
 
         for label in labels.stack {
@@ -466,81 +476,68 @@ impl<'a> Function<'a> {
             }
         }
     }
-
-    pub fn get_builtin(&mut self, builtin: &'a str, ctx: &mut Context<'a>) -> ResultID {
-        if let Some(id) = self.builtins.get(&builtin) {
-            return *id;
-        }
-
-        let id: ResultID = ctx.id.gen().into();
-
-        let (ty, dec) = match builtin {
-            "GlobalInvocationID" => (Type::Base(BaseType::Uint3), BuiltIn::GlobalInvocationId()),
-            _ => unimplemented!(),
-        };
-        let ty = Type::Ptr(Box::new(ty), StorageClass::Function());
-
-        let typeid = ctx.get_type(ty.clone());
-
-        self.variable_instr.push(Opcode::Variable(
-            typeid,
-            id.into(),
-            StorageClass::Function(),
-            None,
-        ));
-
-        let name = builtin;
-        self.builtins.insert(name, id);
-        self.get_curr_scope()
-            .add_symbol(name, Symbol { name, ty, id });
-
-        self.decorations
-            .push(Opcode::Decorate(id.into(), Decoration::BuiltIn(dec)));
-
-        id
-    }
 }
 
 pub struct Context<'a> {
     id: IDGenerator,
     global_scope: Scope<'a>,
     functions: Vec<Function<'a>>,
-    function_map: HashMap<&'a str, ResultID>,
+    function_map: HashMap<&'a str, usize>,
     types: HashMap<Type<'a>, TypeID>,
     structs: HashMap<&'a str, Struct<'a>>,
     constants: HashMap<(TypeID, [u8; 4]), ResultID>,
     type_instr: Vec<Opcode>,
     const_instr: Vec<Opcode>,
+    decorations: Vec<Opcode>,
+    member_names: Vec<Opcode>,
+    interface_vars: Vec<Opcode>,
+    builtins: HashMap<&'a str, ResultID>,
 }
 
 impl<'a> Context<'a> {
     pub fn into_module(mut self) -> Module {
         let mut module = Module::default();
         let bound = self.id.gen().0;
-        module.insert_op(Opcode::Capability(Capability::Kernel()));
-        module.insert_op(Opcode::Capability(Capability::Addresses()));
-        module.insert_op(Opcode::Capability(Capability::VulkanMemoryModel()));
+        // module.insert_op(Opcode::Capability(Capability::Kernel()));
+        // module.insert_op(Opcode::Capability(Capability::Addresses()));
+        // module.insert_op(Opcode::Capability(Capability::VulkanMemoryModel()));
         module.insert_op(Opcode::Capability(Capability::Shader()));
-        module.insert_op(Opcode::Extension("SPV_KHR_vulkan_memory_model".to_owned()));
+        module.insert_op(Opcode::Capability(Capability::ImageQuery()));
+        // module.insert_op(Opcode::Extension("SPV_KHR_vulkan_memory_model".to_owned()));
 
         module.insert_op(Opcode::MemoryModel(
             AddressingModel::Logical(),
-            MemoryModel::Vulkan(),
+            MemoryModel::GLSL450(),
         ));
 
-        for (name, id) in self.function_map {
+        for (name, idx) in self.function_map {
+            let id = self.functions.get(idx).unwrap().id;
+            let local_size = self.functions.get(idx).unwrap().local_size;
+            let mut interface = vec![];
+            std::mem::swap(
+                &mut interface,
+                &mut self.functions.get_mut(idx).unwrap().interface,
+            );
+
             module.insert_op(Opcode::EntryPoint(
-                ExecutionModel::Kernel(),
+                ExecutionModel::GLCompute(),
                 id.into(),
                 name.to_owned(),
-                vec![],
+                interface,
+            ));
+
+            module.insert_op(Opcode::ExecutionMode(
+                id.into(),
+                ExecutionMode::LocalSize(local_size.0, local_size.1, local_size.2),
             ));
         }
 
-        for f in &self.functions {
-            for dec in &f.decorations {
-                module.insert_op(dec.clone());
-            }
+        for mem in self.member_names {
+            module.insert_op(mem);
+        }
+
+        for dec in self.decorations {
+            module.insert_op(dec);
         }
 
         for t in self.type_instr {
@@ -548,6 +545,9 @@ impl<'a> Context<'a> {
         }
 
         for opc in self.const_instr {
+            module.insert_op(opc);
+        }
+        for opc in self.interface_vars {
             module.insert_op(opc);
         }
 
@@ -569,8 +569,12 @@ impl<'a> Context<'a> {
             structs: HashMap::new(),
             constants: HashMap::new(),
             function_map: HashMap::new(),
+            builtins: HashMap::new(),
             type_instr: Vec::new(),
             const_instr: Vec::new(),
+            decorations: Vec::new(),
+            member_names: Vec::new(),
+            interface_vars: Vec::new(),
         }
     }
 
@@ -588,10 +592,35 @@ impl<'a> Context<'a> {
     }
 
     pub fn get_builtin(&mut self, builtin: &'a str) -> ResultID {
-        let mut f = self.functions.pop().unwrap();
-        let b = f.get_builtin(builtin, self);
-        self.functions.push(f);
-        b
+        if let Some(id) = self.builtins.get(&builtin) {
+            return *id;
+        }
+
+        let id: ResultID = self.id.gen().into();
+
+        let (ty, dec) = match builtin {
+            "GlobalInvocationID" => (Type::Base(BaseType::Uint3), BuiltIn::GlobalInvocationId()),
+            _ => unimplemented!(),
+        };
+        let ty = Type::Ptr(Box::new(ty), StorageClass::Input());
+
+        let typeid = self.get_type(ty.clone());
+
+        self.interface_vars.push(Opcode::Variable(
+            typeid,
+            id.into(),
+            StorageClass::Input(),
+            None,
+        ));
+
+        let name = builtin;
+        self.builtins.insert(name, id);
+        self.global_scope.add_symbol(name, Symbol { name, ty, id });
+
+        self.decorations
+            .push(Opcode::Decorate(id.into(), Decoration::BuiltIn(dec)));
+
+        id
     }
 
     pub fn push(&mut self) {
@@ -663,6 +692,7 @@ impl<'a> Context<'a> {
                     val = self.cast(val, valt, ty);
                 }
                 ((x, n), (y, 1)) => {
+                    val = self.cast(val, valt, attr_type(x, 1));
                     val = self.cctor(Type::Base(attr_type(x, n)), vec![val; n]).1;
                 }
                 _ => panic!(),
@@ -673,16 +703,36 @@ impl<'a> Context<'a> {
         self.get_curr_scope().add_symbol(name, var);
         id
     }
+    pub fn get_uint(&mut self, val: u32) -> ResultID {
+        self.get_val(BaseType::Uint, val.to_ne_bytes())
+    }
 
     pub fn create_func(
         &mut self,
+        size: (u32, u32, u32),
         name: &'a str,
         args: Vec<(&'a str, Type<'a>)>,
         out: Option<Vec<(&'a str, Type<'a>)>>,
         stats: Vec<Statement<'a>>,
     ) -> ResultID {
         let id = self.id.gen().into();
-        self.functions.push(Function::new(id, name));
+        {
+            let id = self.id.gen();
+            let typeid = self.get_type(Type::Base(BaseType::Uint3));
+            let x = self.get_uint(size.0).into();
+            let y = self.get_uint(size.1).into();
+            let z = self.get_uint(size.2).into();
+            self.const_instr
+                .push(Opcode::ConstantComposite(typeid, id.into(), vec![x, y, z]));
+            self.decorations.push(Opcode::Decorate(
+                id,
+                Decoration::BuiltIn(BuiltIn::WorkgroupSize()),
+            ));
+        }
+
+        self.functions.push(Function::new(id, size, name));
+        let gid = self.get_builtin("GlobalInvocationID");
+        self.functions.last_mut().unwrap().interface.push(gid.into());
 
         self.push();
         let ret = self.get_type(Type::Void);
@@ -694,24 +744,205 @@ impl<'a> Context<'a> {
         }
 
         let fty = self
-            .get_type(Type::Function(Box::new(Type::Void), argsx))
+            .get_type(Type::Function(Box::new(Type::Void), vec![]))
             .into();
 
         self.add_instr(Opcode::Function(ret, id, FunctionControl::None(), fty));
 
-        let mut interface: Vec<ID> = vec![];
+        let lbl = self.label();
+        self.set_label(lbl);
 
+        let mut images = vec![];
+
+        let input_block_type_id = self.id.gen();
+        let input_block_ptr_type_id = self.id.gen();
+        let input_block_id = self.id.gen();
+
+        let mut input_block_fields: Vec<ID> = vec![];
+
+        let mut offset = 0;
         for (name, ty) in args {
-            interface.push(self.create_arg(name, ty).into());
+            match ty {
+                Type::Base(t @ (BaseType::Image | BaseType::Image2D | BaseType::Image3D)) => {
+                    images.push((name, t, Decoration::NonWritable()))
+                }
+                _ => {
+                    let idx = input_block_fields.len() as u32;
+
+                    self.member_names.push(Opcode::MemberName(
+                        input_block_type_id,
+                        idx,
+                        name.to_owned(),
+                    ));
+
+                    self.decorations.push(Opcode::MemberDecorate(
+                        input_block_type_id,
+                        idx,
+                        Decoration::Offset(offset),
+                    ));
+
+                    offset += ty.get_base().get_size();
+                    input_block_fields.push(self.get_type(ty.clone()).into());
+
+                    let idx = self.get_val(BaseType::Uint, idx.to_ne_bytes());
+
+                    let id = self.ptr_access_chain(
+                        input_block_id.into(),
+                        ty.clone(),
+                        StorageClass::Uniform(),
+                        idx,
+                    );
+                    self.create_variable(ty, name, StorageClass::Function(), Some(id));
+                }
+            }
+        }
+        if !input_block_fields.is_empty() {
+            self.decorations
+                .push(Opcode::Decorate(input_block_type_id, Decoration::Block()));
+
+            self.member_names.push(Opcode::Name(
+                input_block_type_id,
+                format!("{}_input_block_t", name),
+            ));
+            self.member_names.push(Opcode::Name(
+                input_block_id,
+                format!("{}_input_block", name),
+            ));
+
+            self.type_instr.push(Opcode::TypeStruct(
+                input_block_type_id.into(),
+                input_block_fields,
+            ));
+            self.type_instr.push(Opcode::TypePointer(
+                input_block_ptr_type_id.into(),
+                StorageClass::Uniform(),
+                input_block_type_id.into(),
+            ));
+
+            self.interface_vars.push(Opcode::Variable(
+                input_block_ptr_type_id.into(),
+                input_block_id.into(),
+                StorageClass::Uniform(),
+                None,
+            ));
+            self.decorations.push(Opcode::Decorate(
+                input_block_id.into(),
+                Decoration::DescriptorSet(1),
+            ));
+            self.decorations.push(Opcode::Decorate(
+                input_block_id.into(),
+                Decoration::Binding(0),
+            ));
         }
 
         if let Some(out) = out {
+            let output_block_type_id = self.id.gen();
+            let output_block_ptr_type_id = self.id.gen();
+            let output_block_id = self.id.gen();
+            let mut output_block_fields: Vec<ID> = vec![];
+            let mut offset = 0;
             for (name, ty) in out {
-                interface.push(self.create_arg(name, ty).into());
+                match ty {
+                    Type::Base(t @ (BaseType::Image | BaseType::Image2D | BaseType::Image3D)) => {
+                        images.push((name, t, Decoration::NonReadable()))
+                    }
+                    _ => {
+                        let idx = output_block_fields.len() as u32;
+                        self.member_names.push(Opcode::MemberName(
+                            output_block_type_id,
+                            idx,
+                            name.to_owned(),
+                        ));
+
+                        self.decorations.push(Opcode::MemberDecorate(
+                            output_block_id,
+                            idx,
+                            Decoration::Offset(offset),
+                        ));
+
+                        offset += ty.get_base().get_size();
+                        output_block_fields.push(self.get_type(ty.clone()).into());
+
+                        let idx = self.get_val(BaseType::Uint, idx.to_ne_bytes());
+
+                        let id = self.ptr_access_chain(
+                            output_block_id.into(),
+                            ty.clone(),
+                            StorageClass::Uniform(),
+                            idx,
+                        );
+                        self.create_variable(ty, name, StorageClass::Function(), Some(id));
+                    }
+                }
+            }
+
+            if !output_block_fields.is_empty() {
+                self.decorations
+                    .push(Opcode::Decorate(output_block_type_id, Decoration::Block()));
+                self.member_names.push(Opcode::Name(
+                    output_block_type_id,
+                    format!("{}_output_block_t", name),
+                ));
+                self.member_names.push(Opcode::Name(
+                    output_block_id,
+                    format!("{}_output_block", name),
+                ));
+
+                self.type_instr.push(Opcode::TypeStruct(
+                    output_block_type_id.into(),
+                    output_block_fields,
+                ));
+                self.type_instr.push(Opcode::TypePointer(
+                    output_block_ptr_type_id.into(),
+                    StorageClass::Uniform(),
+                    output_block_type_id.into(),
+                ));
+
+                self.interface_vars.push(Opcode::Variable(
+                    output_block_ptr_type_id.into(),
+                    output_block_id.into(),
+                    StorageClass::Uniform(),
+                    None,
+                ));
+                self.decorations.push(Opcode::Decorate(
+                    input_block_id.into(),
+                    Decoration::DescriptorSet(1),
+                ));
+                self.decorations.push(Opcode::Decorate(
+                    input_block_id.into(),
+                    Decoration::Binding(1),
+                ));
             }
         }
-        let lbl = self.label();
-        self.set_label(lbl);
+
+        for (binding, (image_name, ty, dec)) in images.into_iter().enumerate() {
+            let id: ResultID = self.id.gen().into();
+            let ty = Type::Ptr(Box::new(Type::Base(ty)), StorageClass::UniformConstant());
+            let typeid = self.get_type(ty.clone());
+            self.decorations.push(Opcode::Decorate(id.into(), dec));
+            self.interface_vars.push(Opcode::Variable(
+                typeid,
+                id,
+                StorageClass::UniformConstant(),
+                None,
+            ));
+            self.member_names
+                .push(Opcode::Name(id.into(), format!("{}_{}", name, image_name)));
+
+            self.decorations
+                .push(Opcode::Decorate(id.into(), Decoration::DescriptorSet(0)));
+            self.decorations.push(Opcode::Decorate(
+                id.into(),
+                Decoration::Binding(binding as u32),
+            ));
+
+            let var = Symbol {
+                name: image_name,
+                ty,
+                id,
+            };
+            self.get_curr_scope().add_symbol(image_name, var);
+        }
 
         for stat in stats {
             stat.lower(self);
@@ -720,23 +951,41 @@ impl<'a> Context<'a> {
         self.add_instr(Opcode::Return());
         self.add_instr(Opcode::FunctionEnd());
         self.pop();
-
-        self.function_map.insert(name, id);
+        let idx = self.functions.len() - 1;
+        self.function_map.insert(name, idx);
         id
     }
 
     pub fn create_arg(&mut self, name: &'a str, ty: Type<'a>) -> ResultID {
         let id: ResultID = self.id.gen().into();
-
-        let ty2 = match ty.clone() {
-            ty @ Type::Base(BaseType::Image) => ty,
-            ty @ Type::Base(BaseType::Image2D) => ty,
-            ty @ Type::Base(BaseType::Image3D) => ty,
-            ty => ty,
-        };
-
-        let typeid = self.get_type(ty2);
+        let typeid = self.get_type(ty.clone());
         self.add_instr(Opcode::FunctionParameter(typeid, id));
+        let var = Symbol { name, ty, id };
+        self.get_curr_scope().add_symbol(name, var);
+        id
+    }
+
+    pub fn create_interface_variable(
+        &mut self,
+        name: &'a str,
+        ty: Type<'a>,
+        set: u32,
+        binding: u32,
+    ) -> ResultID {
+        let id: ResultID = self.id.gen().into();
+
+        let ty = Type::Ptr(Box::new(ty), StorageClass::UniformConstant());
+        let typeid = self.get_type(ty.clone());
+        self.interface_vars.push(Opcode::Variable(
+            typeid,
+            id,
+            StorageClass::UniformConstant(),
+            None,
+        ));
+        self.decorations
+            .push(Opcode::Decorate(id.into(), Decoration::DescriptorSet(set)));
+        self.decorations
+            .push(Opcode::Decorate(id.into(), Decoration::Binding(binding)));
         let var = Symbol { name, ty, id };
         self.get_curr_scope().add_symbol(name, var);
         id
@@ -803,12 +1052,12 @@ impl<'a> Context<'a> {
                 ),
                 _ => match type_attr(*t) {
                     (0, 1) => Opcode::TypeFloat(id, 32),
-                    (1, 1) => Opcode::TypeInt(id, 32, 0),
-                    (2, 1) => return self.get_type(Base(Int)),
+                    (1, 1) => Opcode::TypeInt(id, 32, 1),
+                    (2, 1) => Opcode::TypeInt(id, 32, 0),
                     (3, 1) => Opcode::TypeBool(id),
                     (0, n) => Opcode::TypeVector(id, self.get_type(Base(Float)).into(), n as u32),
                     (1, n) => Opcode::TypeVector(id, self.get_type(Base(Int)).into(), n as u32),
-                    (2, n) => return self.get_type(Base(attr_type(1, n))),
+                    (2, n) => Opcode::TypeVector(id, self.get_type(Base(Uint)).into(), n as u32),
                     (3, n) => Opcode::TypeVector(id, self.get_type(Base(Bool)).into(), n as u32),
                     _ => unreachable!(),
                 },
@@ -856,7 +1105,7 @@ impl<'a> Context<'a> {
         self.add_instr(Opcode::Store(id.into(), val.into(), None));
     }
 
-    fn load_if(&mut self, mut expr: (VT, ResultID, Type<'a>)) -> (VT, ResultID, Type<'a>) {
+    fn load_if(&mut self, expr: (VT, ResultID, Type<'a>)) -> (VT, ResultID, Type<'a>) {
         match expr {
             (VT::L, id, Type::Ptr(ty, _)) => (VT::R, self.load(id, *ty.clone()), *ty),
             _ => expr,
@@ -1089,9 +1338,9 @@ impl<'a> Context<'a> {
     fn get_image_size(&mut self, img: ResultID, ty: BaseType) -> (VT, ResultID, Type<'a>) {
         let re: ResultID = self.id.gen().into();
         let sz = match ty {
-            BaseType::Image => BaseType::Uint,
-            BaseType::Image2D => BaseType::Uint2,
-            BaseType::Image3D => BaseType::Uint3,
+            BaseType::Image => BaseType::Int,
+            BaseType::Image2D => BaseType::Int2,
+            BaseType::Image3D => BaseType::Int3,
             _ => unreachable!(),
         };
         let typeid = self.get_type(Type::Base(sz));
@@ -1113,9 +1362,9 @@ impl<'a> Context<'a> {
         let fmt = fmt.get_base();
 
         match (ty.get_base(), dim.get_base()) {
-            (BaseType::Image3D, BaseType::Float3 | BaseType::Uint3 | BaseType::Int3) => (),
-            (BaseType::Image2D, BaseType::Float2 | BaseType::Uint2 | BaseType::Int2) => (),
-            (BaseType::Image, BaseType::Float | BaseType::Uint | BaseType::Int) => (),
+            (BaseType::Image3D, BaseType::Float4 | BaseType::Float3 | BaseType::Uint3 | BaseType::Int3) => (),
+            (BaseType::Image2D, BaseType::Float4 | BaseType::Float2 | BaseType::Uint2 | BaseType::Int2) => (),
+            (BaseType::Image,   BaseType::Float4 | BaseType::Float | BaseType::Uint | BaseType::Int) => (),
             (ty, dim) => unreachable!("{:?} {:?}", ty, dim),
         };
 
@@ -1130,7 +1379,7 @@ impl<'a> Context<'a> {
             (x, 4) => {
                 color = self.cast(color, fmt, BaseType::Float4);
             }
-            _ => unreachable!(),
+            what => unreachable!("{:?}", what),
         }
 
         self.add_instr(Opcode::ImageWrite(
@@ -1191,12 +1440,6 @@ impl<'a> Context<'a> {
             return id;
         }
 
-        match (type_attr(from).0, type_attr(to).0) {
-            (1, 2) => return id,
-            (2, 1) => return id,
-            _ => (),
-        };
-
         let id = id.into();
         let re: ResultID = self.id.gen().into();
 
@@ -1207,6 +1450,8 @@ impl<'a> Context<'a> {
             (0, 2) => Opcode::ConvertFToU(typeid, re, id),
             (1, 0) => Opcode::ConvertSToF(typeid, re, id),
             (2, 0) => Opcode::ConvertUToF(typeid, re, id),
+            (1, 2) => Opcode::Bitcast(typeid, re, id),
+            (2, 1) => Opcode::Bitcast(typeid, re, id),
             _ => unreachable!(),
         };
 
@@ -1408,7 +1653,8 @@ impl<'a> Expr<'a> {
                         assert!(args.len() == 1);
                         let mut args = args;
                         let (_, img, ty) = args.pop().unwrap().lower(ctx);
-                        match ty {
+                        let img = ctx.load(img, ty.get_pointee());
+                        match ty.get_pointee() {
                             Type::Base(ty) => return ctx.get_image_size(img, ty),
                             _ => unreachable!(),
                         }
@@ -1427,7 +1673,8 @@ impl<'a> Expr<'a> {
                         let color = args.pop().unwrap().lower(ctx);
                         let coord = args.pop().unwrap().lower(ctx);
                         let (_, img, ty) = args.pop().unwrap().lower(ctx);
-                        ctx.write_image(img, ty, coord, color);
+                        let img = ctx.load(img, ty.get_pointee());
+                        ctx.write_image(img, ty.get_pointee(), coord, color);
                         return (VT::None, ID(0).into(), Type::Void);
                     }
                     Expr::Ident("read_image") => {
@@ -1435,7 +1682,8 @@ impl<'a> Expr<'a> {
                         let mut args = args;
                         let coord = args.pop().unwrap().lower(ctx);
                         let (_, img, ty) = args.pop().unwrap().lower(ctx);
-                        return ctx.read_image(img, ty, coord);
+                        let img = ctx.load(img, ty.get_pointee());
+                        return ctx.read_image(img, ty.get_pointee(), coord);
                     }
                     _ => (),
                 };
@@ -1481,6 +1729,13 @@ impl<'a> Expr<'a> {
                 what => unimplemented!("{:?}", what),
             },
             Expr::Binop(l, op, r) => {
+                if "=" == op {
+                    let l = l.lower(ctx);
+                    let r = r.lower_decl(l.2.get_pointee(), ctx);
+                    ctx.assign(l, r);
+                    return (VT::None, ID(0).into(), Type::Void);
+                }
+
                 let l = l.lower(ctx);
                 let r = r.lower(ctx);
                 match op {

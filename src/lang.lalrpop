@@ -15,7 +15,7 @@ InParamDef = {
 }
 
 FunctionDef = {
-  "kernel"? "fn" <Ident> "(" <List<InParamDef>> ")" <("->" "(" <List<(<Ident> ":" <Type>)>> ")")?> "{"  <Statement*> "}"
+  <("kernel" "[" <Int> "," <Int> "," <Int> "]")?> "fn" <Ident> "(" <List<InParamDef>> ")" <("->" "(" <List<(<Ident> ":" <Type>)>> ")")?> "{"  <Statement*> "}"
 }
 
 Declspec = {
@@ -33,7 +33,7 @@ Statement: Statement<'input> = {
     }
   },
   <Expr> ";" => Statement::Expr(<>),
-  <Expr> "=" <Composite> ";" => Statement::Assign(<>),
+  // <Expr> "=" <Composite> ";" => Statement::Assign(<>),
   <Declspec?> <Type> <Ident> "=" <Composite> ";" => Statement::Decl(<>),
   "if" "(" <Expr> ")"  "{" <Statement*> "}" <("else" "{" <Statement*> "}" )?> => Statement::If(<>),
   "while" "(" <Expr> ")" "{" <Statement*> "}" => Statement::While(<>),
@@ -95,7 +95,7 @@ Addop = { "+", "-"}
 Shlr = { "<<", ">>" }
 Relop = {  "<", "<=", ">", ">="}
 Equop = {  "==", "!=" }
-Assignop = { "+=", "-=", "*=", "/=", "%=" }
+Assignop = { "=", "+=", "-=", "*=", "/=", "%=" }
 
 LogAndop = { "&&" }
 LogOrop = { "||" }
@@ -112,9 +112,12 @@ LogAnd = Binop<BitOr, LogAndop>;
 LogOr = Binop<LogAnd, LogOrop>;
 Assign = Binop<LogOr, Assignop>;
 
+Int: u32 = {
+  <r"\d+">  => <>.parse().unwrap(),
+}
 
 Literal : Expr<'input> = {
-  <r"\d+">      => Expr::Uint(<>.parse().unwrap()),
+  <Int>      => Expr::Uint(<>),
   <r"\d+\.\d+"> => Expr::Float(<>.parse().unwrap()),
 }
 
