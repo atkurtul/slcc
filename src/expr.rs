@@ -19,6 +19,7 @@ pub enum Expr<'a> {
     Access(Box<Expr<'a>>, &'a str),
     Binop(Box<Expr<'a>>, &'a str, Box<Expr<'a>>),
     List(Vec<Expr<'a>>),
+    Ctor(Type<'a>, Vec<Expr<'a>>),
 }
 
 #[derive(Debug)]
@@ -732,7 +733,11 @@ impl<'a> Context<'a> {
 
         self.functions.push(Function::new(id, size, name));
         let gid = self.get_builtin("GlobalInvocationID");
-        self.functions.last_mut().unwrap().interface.push(gid.into());
+        self.functions
+            .last_mut()
+            .unwrap()
+            .interface
+            .push(gid.into());
 
         self.push();
         let ret = self.get_type(Type::Void);
@@ -1362,9 +1367,18 @@ impl<'a> Context<'a> {
         let fmt = fmt.get_base();
 
         match (ty.get_base(), dim.get_base()) {
-            (BaseType::Image3D, BaseType::Float4 | BaseType::Float3 | BaseType::Uint3 | BaseType::Int3) => (),
-            (BaseType::Image2D, BaseType::Float4 | BaseType::Float2 | BaseType::Uint2 | BaseType::Int2) => (),
-            (BaseType::Image,   BaseType::Float4 | BaseType::Float | BaseType::Uint | BaseType::Int) => (),
+            (
+                BaseType::Image3D,
+                BaseType::Float4 | BaseType::Float3 | BaseType::Uint3 | BaseType::Int3,
+            ) => (),
+            (
+                BaseType::Image2D,
+                BaseType::Float4 | BaseType::Float2 | BaseType::Uint2 | BaseType::Int2,
+            ) => (),
+            (
+                BaseType::Image,
+                BaseType::Float4 | BaseType::Float | BaseType::Uint | BaseType::Int,
+            ) => (),
             (ty, dim) => unreachable!("{:?} {:?}", ty, dim),
         };
 
@@ -1573,22 +1587,7 @@ impl<'a> Expr<'a> {
         ctx: &mut Context<'a>,
     ) -> (VT, ResultID, Type<'a>) {
         match self {
-            Expr::List(args) => {
-                let args: Vec<_> = args
-                    .into_iter()
-                    .enumerate()
-                    .map(|(idx, e)| {
-                        let e = e.lower(ctx);
-                        let (_, id, ty) = ctx.load_if(e);
-                        ctx.cast(
-                            id,
-                            ty.get_base(),
-                            composite.type_at_idx(idx as u32, ctx).get_base(),
-                        )
-                    })
-                    .collect();
-                ctx.cctor(composite, args)
-            }
+            Expr::List(args) => Expr::Ctor(composite, args).lower(ctx),
             _ => self.lower(ctx),
         }
     }
@@ -1610,6 +1609,23 @@ impl<'a> Expr<'a> {
                 ctx.get_val(BaseType::Uint, val.to_ne_bytes()),
                 Type::Base(BaseType::Uint),
             ),
+
+            Expr::Ctor(composite, args) => {
+                let args: Vec<_> = args
+                    .into_iter()
+                    .enumerate()
+                    .map(|(idx, e)| {
+                        let e = e.lower(ctx);
+                        let (_, id, ty) = ctx.load_if(e);
+                        ctx.cast(
+                            id,
+                            ty.get_base(),
+                            composite.type_at_idx(idx as u32, ctx).get_base(),
+                        )
+                    })
+                    .collect();
+                ctx.cctor(composite, args)
+            }
             Expr::Unop(op, expr) => match op {
                 "&" => match expr.lower(ctx) {
                     (VT::L, id, Type::Ptr(ty, class)) => (VT::R, id, Type::Ptr(ty, class)),

@@ -6,10 +6,10 @@ fn main(input_image: image2d, size: int) -> (output_image: image2d)
     int width = image_size.x;
     int height = image_size.y;
 
-    uint2 coord = [ get_global_id(0), get_global_id(1) ];
+    uint2 coord = uint2(get_global_id(0), get_global_id(1));
 
     float4 sum  = 0;
-    uint  num  = 0;
+    uint   num  = 0;
 
     int2 shift = 0;
 

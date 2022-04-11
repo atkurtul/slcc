@@ -33,7 +33,6 @@ Statement: Statement<'input> = {
     }
   },
   <Expr> ";" => Statement::Expr(<>),
-  // <Expr> "=" <Composite> ";" => Statement::Assign(<>),
   <Declspec?> <Type> <Ident> "=" <Composite> ";" => Statement::Decl(<>),
   "if" "(" <Expr> ")"  "{" <Statement*> "}" <("else" "{" <Statement*> "}" )?> => Statement::If(<>),
   "while" "(" <Expr> ")" "{" <Statement*> "}" => Statement::While(<>),
@@ -62,6 +61,7 @@ Atom: Expr<'input> = {
   <Ident> => Expr::Ident(<>),
   <Literal>,
   "(" <Expr> ")",
+  <BaseType> "(" <List<Expr>> ")" => Expr::Ctor(<>),
 }
 
 Postfix : Expr<'input> = {
