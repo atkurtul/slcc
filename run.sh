@@ -6,7 +6,7 @@ spirv-dis.exe ./lang.spv > lang.s
 spirv-val lang.spv
 
 spirv-opt lang.spv -Os -O -o lang.opt.spv $ags
-spirv-dis lang.opt.spv  --no-header --no-indent  --comment > lang.opt.s
+spirv-dis lang.opt.spv  --no-header --comment > lang.opt.s
 
 cp lang.spv      ~/mediaz/CMakeBuild/bin/Shaders/lang.spv
 cp lang.opt.spv  ~/mediaz/CMakeBuild/bin/Shaders/lang.opt.spv

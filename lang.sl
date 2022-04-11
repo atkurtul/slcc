@@ -1,6 +1,4 @@
 
-
-
 kernel [1,1,1]
 fn main(input_image: image2d, size: int) -> (output_image: image2d)
 { 
@@ -13,7 +11,7 @@ fn main(input_image: image2d, size: int) -> (output_image: image2d)
     float4 sum  = 0;
     uint  num  = 0;
 
-    int2 shift = -4;
+    int2 shift = 0;
 
     for (shift.x = -size; shift.x <= size; ++shift.x) {
         for (shift.y = -size; shift.y <= size; ++shift.y) {
