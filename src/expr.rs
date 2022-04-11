@@ -63,38 +63,44 @@ impl<'a> Statement<'a> {
 
             Statement::Void => (),
             Statement::For(init, con, post, body) => {
+                let header = ctx.label();
                 let con_label = ctx.label();
-                let post_label = ctx.label();
                 let body_label = ctx.label();
+                let post_label = ctx.label();
                 let tail_label = ctx.label();
+                let hid = header.id;
 
-                let cid = con_label.id;
-                ctx.jump(cid);
+                if let Some(init) = init {
+                    init.lower(ctx);
+                }
+                ctx.jump(hid);
+                ctx.set_label(header);
+                ctx.add_instr(Opcode::LoopMerge(
+                    tail_label.id.into(),
+                    post_label.id.into(),
+                    LoopControl::None(),
+                ));
+                ctx.jump(con_label.id);
 
-                init.map(|expr| expr.lower(ctx));
                 ctx.set_label(con_label);
 
-                match con {
-                    Some(con) => {
-                        let c = con.lower(ctx).1;
-                        ctx.branch(c, body_label.id, tail_label.id)
-                    }
-                    _ => {
-                        ctx.jump(body_label.id);
-                    }
+                let c = if let Some(con) = con {
+                    con.lower(ctx).1
+                } else {
+                    ctx.get_bool(true)
                 };
+                ctx.branch(c, body_label.id, tail_label.id);
+
                 ctx.set_label(body_label);
                 for stat in body {
                     stat.lower(ctx);
                 }
                 ctx.jump(post_label.id);
-
                 ctx.set_label(post_label);
                 if let Some(post) = post {
                     post.lower(ctx);
                 }
-                ctx.jump(cid);
-
+                ctx.jump(hid);
                 ctx.set_label(tail_label);
             }
 
@@ -361,6 +367,12 @@ impl Label {
     fn push(&mut self, op: Opcode) {
         self.instr.push(op);
     }
+
+    fn prepend(&mut self, mut v: Vec<Opcode>) {
+        v.insert(0, Opcode::Label(self.id));
+        std::mem::swap(&mut v, &mut self.instr);
+        self.instr.extend(v.into_iter().skip(1));
+    }
 }
 
 struct LabelStack {
@@ -380,6 +392,10 @@ impl LabelStack {
 
     fn push(&mut self, op: Opcode) {
         self.stack.last_mut().unwrap().push(op);
+    }
+
+    fn prepend(&mut self, idx: usize, instr: Vec<Opcode>) {
+        self.stack.get_mut(idx).unwrap().prepend(instr);
     }
 }
 
@@ -439,20 +455,12 @@ impl<'a> Function<'a> {
         self.scopes.get_mut(cur).unwrap()
     }
 
-    pub fn write_to_module(mut self, module: &mut Module) {
-        self.labels
-            .stack
-            .get_mut(1)
-            .unwrap()
-            .instr
-            .extend(self.variable_instr.into_iter());
-        let id = self.labels.stack.get(2).unwrap().id;
-        self.labels
-            .stack
-            .get_mut(1)
-            .unwrap()
-            .push(Opcode::Branch(id.into()));
-        for label in self.labels.stack {
+    pub fn write_to_module(self, module: &mut Module) {
+        let mut labels = self.labels;
+
+        labels.prepend(1, self.variable_instr);
+
+        for label in labels.stack {
             for instr in label.instr {
                 module.insert_op(instr);
             }
@@ -502,6 +510,7 @@ pub struct Context<'a> {
     structs: HashMap<&'a str, Struct<'a>>,
     constants: HashMap<(TypeID, [u8; 4]), ResultID>,
     type_instr: Vec<Opcode>,
+    const_instr: Vec<Opcode>,
 }
 
 impl<'a> Context<'a> {
@@ -510,10 +519,13 @@ impl<'a> Context<'a> {
         let bound = self.id.gen().0;
         module.insert_op(Opcode::Capability(Capability::Kernel()));
         module.insert_op(Opcode::Capability(Capability::Addresses()));
+        module.insert_op(Opcode::Capability(Capability::VulkanMemoryModel()));
+        module.insert_op(Opcode::Capability(Capability::Shader()));
+        module.insert_op(Opcode::Extension("SPV_KHR_vulkan_memory_model".to_owned()));
 
         module.insert_op(Opcode::MemoryModel(
-            AddressingModel::Physical32(),
-            MemoryModel::OpenCL(),
+            AddressingModel::Logical(),
+            MemoryModel::Vulkan(),
         ));
 
         for (name, id) in self.function_map {
@@ -535,8 +547,8 @@ impl<'a> Context<'a> {
             module.insert_op(t);
         }
 
-        for ((ty, val), id) in self.constants {
-            module.insert_op(Opcode::Constant(ty, id, u32::from_ne_bytes(val)));
+        for opc in self.const_instr {
+            module.insert_op(opc);
         }
 
         // module.insert_op(Opcode::ExecutionMode());
@@ -558,6 +570,7 @@ impl<'a> Context<'a> {
             constants: HashMap::new(),
             function_map: HashMap::new(),
             type_instr: Vec::new(),
+            const_instr: Vec::new(),
         }
     }
 
@@ -570,7 +583,7 @@ impl<'a> Context<'a> {
         } else {
             Opcode::ConstantFalse(typeid, re.into())
         };
-        self.add_instr(val);
+        self.const_instr.push(val);
         re
     }
 
@@ -699,8 +712,6 @@ impl<'a> Context<'a> {
         }
         let lbl = self.label();
         self.set_label(lbl);
-        let lbl = self.label();
-        self.set_label(lbl);
 
         for stat in stats {
             stat.lower(self);
@@ -739,6 +750,8 @@ impl<'a> Context<'a> {
         use BaseType::*;
         use Type::*;
         let id: ResultID = self.id.gen().into();
+        let sampled_type = Base(Float);
+        let format = ImageFormat::Rgba8();
 
         let opc = match &ty {
             Void => Opcode::TypeVoid(id),
@@ -757,35 +770,35 @@ impl<'a> Context<'a> {
             Base(t) => match t {
                 Image => Opcode::TypeImage(
                     id,
-                    self.get_type(Void).into(),
+                    self.get_type(sampled_type).into(),
                     Dim::_1D(),
                     0,
                     0,
                     0,
                     2,
-                    ImageFormat::Unknown(),
+                    format,
                     None,
                 ),
                 Image2D => Opcode::TypeImage(
                     id,
-                    self.get_type(Void).into(),
+                    self.get_type(sampled_type).into(),
                     Dim::_2D(),
                     0,
                     0,
                     0,
                     2,
-                    ImageFormat::Unknown(),
+                    format,
                     None,
                 ),
                 Image3D => Opcode::TypeImage(
                     id,
-                    self.get_type(Void).into(),
+                    self.get_type(sampled_type).into(),
                     Dim::_3D(),
                     0,
                     0,
                     0,
                     2,
-                    ImageFormat::Unknown(),
+                    format,
                     None,
                 ),
                 _ => match type_attr(*t) {
@@ -814,6 +827,8 @@ impl<'a> Context<'a> {
         }
         let id = self.id.gen();
         self.constants.insert((ty, val), id.into());
+        self.const_instr
+            .push(Opcode::Constant(ty, id.into(), u32::from_ne_bytes(val)));
         id.into()
     }
 
@@ -1093,7 +1108,7 @@ impl<'a> Context<'a> {
         color: (VT, ResultID, Type<'a>),
     ) {
         let (_, coord, dim) = self.load_if(coord);
-        let (_, color, fmt) = self.load_if(color);
+        let (_, mut color, fmt) = self.load_if(color);
 
         let fmt = fmt.get_base();
 
@@ -1103,6 +1118,20 @@ impl<'a> Context<'a> {
             (BaseType::Image, BaseType::Float | BaseType::Uint | BaseType::Int) => (),
             (ty, dim) => unreachable!("{:?} {:?}", ty, dim),
         };
+
+        match type_attr(fmt) {
+            (0, 1) => {
+                color = self.cctor(Type::Base(BaseType::Float4), vec![color; 4]).1;
+            }
+            (x, 1) => {
+                color = self.cast(color, fmt, BaseType::Float);
+                color = self.cctor(Type::Base(BaseType::Float4), vec![color; 4]).1;
+            }
+            (x, 4) => {
+                color = self.cast(color, fmt, BaseType::Float4);
+            }
+            _ => unreachable!(),
+        }
 
         self.add_instr(Opcode::ImageWrite(
             img.into(),
