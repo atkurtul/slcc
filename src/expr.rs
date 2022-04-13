@@ -31,7 +31,7 @@ pub enum Statement<'a> {
     Void,
     While(Expr<'a>, Vec<Statement<'a>>),
     For(
-        Option<Expr<'a>>,
+        Option<Box<Statement<'a>>>,
         Option<Expr<'a>>,
         Option<Expr<'a>>,
         Vec<Statement<'a>>,
@@ -59,6 +59,7 @@ impl<'a> Statement<'a> {
 
             Statement::Void => (),
             Statement::For(init, con, post, body) => {
+                ctx.push();
                 let header = ctx.label();
                 let con_label = ctx.label();
                 let body_label = ctx.label();
@@ -99,9 +100,11 @@ impl<'a> Statement<'a> {
                 }
                 ctx.jump(hid);
                 ctx.set_label(tail_label);
+                ctx.pop();
             }
 
             Statement::If(c, t, f) => {
+                ctx.push();
                 let t_label = ctx.label();
                 let f_label = ctx.label();
                 let r_label = ctx.label();
@@ -126,6 +129,7 @@ impl<'a> Statement<'a> {
                     ctx.jump(r_label.id);
                 }
                 ctx.set_label(r_label);
+                ctx.pop();
             }
             what => unreachable!("{:?}", what),
         }
@@ -349,10 +353,29 @@ impl<'a> Type<'a> {
             _ => unreachable!(),
         }
     }
-    fn get_base(&self) -> BaseType {
+
+    fn get_size(&self) -> u32 {
         match self {
-            Type::Base(base) => *base,
-            _ => unreachable!(),
+            Type::Ptr(_, _) => 8,
+            Type::Base(base) => base.get_size(),
+            _ => panic!(),
+        }
+    }
+
+    fn get_base(&self) -> BaseType {
+        self.get_base_safe().unwrap()
+    }
+
+    fn get_base_safe(&self) -> Option<BaseType> {
+        match self {
+            Type::Base(base) => Some(*base),
+            _ => None,
+        }
+    }
+    fn is_ptr(&self) -> bool {
+        match self {
+            Type::Ptr(_, _) => true,
+            _ => false,
         }
     }
     fn get_pointee(&self) -> Type<'a> {
@@ -504,6 +527,7 @@ impl<'a> Context<'a> {
         // module.insert_op(Opcode::Capability(Capability::VulkanMemoryModel()));
         module.insert_op(Opcode::Capability(Capability::Shader()));
         module.insert_op(Opcode::Capability(Capability::ImageQuery()));
+        module.insert_op(Opcode::Capability(Capability::Image1D()));
         // module.insert_op(Opcode::Extension("SPV_KHR_vulkan_memory_model".to_owned()));
 
         module.insert_op(Opcode::MemoryModel(
@@ -669,6 +693,21 @@ impl<'a> Context<'a> {
         self.add_instr(Opcode::Store(var.1.into(), val.into(), None));
     }
 
+    pub fn create_ptr_variable(
+        &mut self,
+        name: &'a str,
+        val: (VT, ResultID, Type<'a>),
+    ) -> ResultID {
+        let id = val.1;
+        let var = Symbol {
+            name,
+            ty: val.2,
+            id,
+        };
+        self.get_curr_scope().add_symbol(name, var);
+        id
+    }
+
     pub fn create_variable(
         &mut self,
         ty: Type<'a>,
@@ -676,34 +715,45 @@ impl<'a> Context<'a> {
         class: StorageClass,
         val: Option<(VT, ResultID, Type<'a>)>,
     ) -> ResultID {
-        let id: ResultID = self.id.gen().into();
+        if ty.is_ptr() {
+            return self.create_ptr_variable(name, val.unwrap());
+        }
+
         let ty = Type::Ptr(Box::new(ty), class);
+        let id: ResultID = self.id.gen().into();
+
         let typeid = self.get_type(ty.clone());
         self.functions
             .last_mut()
             .unwrap()
             .variable_instr
             .push(Opcode::Variable(typeid, id, class, None));
+
         if let Some(val) = val {
             let (_, mut val, valt) = self.load_if(val);
-            let valt = valt.get_base();
-            let ty = ty.get_base_of_ptr();
-            match (type_attr(ty), type_attr(valt)) {
-                ((x, n), (y, m)) if m == n => {
-                    val = self.cast(val, valt, ty);
+
+            if let Some(valt) = valt.get_base_safe() {
+                let ty = ty.get_base_of_ptr();
+                match (type_attr(ty), type_attr(valt)) {
+                    ((x, n), (y, m)) if m == n => {
+                        val = self.cast(val, valt, ty);
+                    }
+                    ((x, n), (y, 1)) => {
+                        val = self.cast(val, valt, attr_type(x, 1));
+                        val = self.cctor(Type::Base(attr_type(x, n)), vec![val; n]).1;
+                    }
+                    _ => panic!(),
                 }
-                ((x, n), (y, 1)) => {
-                    val = self.cast(val, valt, attr_type(x, 1));
-                    val = self.cctor(Type::Base(attr_type(x, n)), vec![val; n]).1;
-                }
-                _ => panic!(),
             }
+
             self.add_instr(Opcode::Store(id.into(), val.into(), None));
         }
+
         let var = Symbol { name, ty, id };
         self.get_curr_scope().add_symbol(name, var);
         id
     }
+
     pub fn get_uint(&mut self, val: u32) -> ResultID {
         self.get_val(BaseType::Uint, val.to_ne_bytes())
     }
@@ -786,7 +836,7 @@ impl<'a> Context<'a> {
                         Decoration::Offset(offset),
                     ));
 
-                    offset += ty.get_base().get_size();
+                    offset += ty.get_size();
                     input_block_fields.push(self.get_type(ty.clone()).into());
 
                     let idx = self.get_val(BaseType::Uint, idx.to_ne_bytes());
@@ -860,12 +910,12 @@ impl<'a> Context<'a> {
                         ));
 
                         self.decorations.push(Opcode::MemberDecorate(
-                            output_block_id,
+                            output_block_type_id,
                             idx,
                             Decoration::Offset(offset),
                         ));
 
-                        offset += ty.get_base().get_size();
+                        offset += ty.get_size();
                         output_block_fields.push(self.get_type(ty.clone()).into());
 
                         let idx = self.get_val(BaseType::Uint, idx.to_ne_bytes());
@@ -910,11 +960,11 @@ impl<'a> Context<'a> {
                     None,
                 ));
                 self.decorations.push(Opcode::Decorate(
-                    input_block_id.into(),
+                    output_block_id.into(),
                     Decoration::DescriptorSet(1),
                 ));
                 self.decorations.push(Opcode::Decorate(
-                    input_block_id.into(),
+                    output_block_id.into(),
                     Decoration::Binding(1),
                 ));
             }
@@ -1611,7 +1661,7 @@ impl<'a> Expr<'a> {
             ),
 
             Expr::Ctor(composite, args) => {
-                let args: Vec<_> = args
+                let mut args: Vec<_> = args
                     .into_iter()
                     .enumerate()
                     .map(|(idx, e)| {
@@ -1624,6 +1674,15 @@ impl<'a> Expr<'a> {
                         )
                     })
                     .collect();
+                if let Some((t, n)) = composite.get_base_safe().map(type_attr) {
+                    if n != args.len() {
+                        if args.len() == 1 {
+                            args = vec![args.pop().unwrap(); n];
+                        } else {
+                            panic!()
+                        }
+                    }
+                }
                 ctx.cctor(composite, args)
             }
             Expr::Unop(op, expr) => match op {

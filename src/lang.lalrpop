@@ -23,6 +23,12 @@ Declspec = {
   "const",
 }
 
+#[inline]
+DeclOrExpr: Statement<'input> = {
+  <Expr> => Statement::Expr(<>),
+  <Declspec?> <Type> <Ident> "=" <Composite>  => Statement::Decl(<>),
+}
+
 Statement: Statement<'input> = {
   "{" <mut v: Statement*> "}" => {
     let sz = v.len();
@@ -32,11 +38,10 @@ Statement: Statement<'input> = {
       _ => Statement::Block(v),
     }
   },
-  <Expr> ";" => Statement::Expr(<>),
-  <Declspec?> <Type> <Ident> "=" <Composite> ";" => Statement::Decl(<>),
+  <DeclOrExpr> ";",
   "if" "(" <Expr> ")"  "{" <Statement*> "}" <("else" "{" <Statement*> "}" )?> => Statement::If(<>),
   "while" "(" <Expr> ")" "{" <Statement*> "}" => Statement::While(<>),
-  "for" "(" <Expr?> ";" <Expr?> ";" <Expr?>  ")" "{" <Statement*> "}" => Statement::For(<>),
+  "for" "(" <P<DeclOrExpr>?> ";" <Expr?> ";" <Expr?>  ")" "{" <Statement*> "}" => Statement::For(<>),
 }
 
 #[inline]
