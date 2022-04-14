@@ -2,17 +2,12 @@
 #![allow(warnings)]
 use fxhash::FxHashMap;
 use fxhash::FxHashSet;
-use proc_macro2::{Ident, Literal, TokenStream};
-use quote::{format_ident, quote};
-use serde::{Deserialize, Deserializer, Serialize};
-use serde_json::Value;
 
 pub type Map<K, V> = FxHashMap<K, V>;
 pub type Set<K> = FxHashSet<K>;
 
 pub mod opcode;
 pub use opcode::*;
-mod test_asm;
 mod tests;
 
 use std::fs::{self, DirEntry};
@@ -56,10 +51,10 @@ pub fn read_spirv(src_file: &str) -> Box<[u32]> {
 fn read_ops(src: &[u32]) -> Box<[Opcode]> {
     let mut idx = 0;
     let mut ops = vec![];
-    //println!("Reading src: {} {}", idx, src.len());
+    println!("Reading src: {} {}", idx, src.len());
     while idx < src.len() {
         let opc = Opcode::read_word(src, &mut idx);
-        //println!("Reading: {:?}", opc);
+        println!("\tReading: {:?}", opc);
         ops.push(opc);
     }
     ops.into_boxed_slice()
@@ -84,4 +79,5 @@ fn test_bin(src: &str) {
 
 fn main() {
     visit_dirs(Path::new("bin/shaders"), test_bin);
+    // test_bin("bin/shaders/hdr/composition.spv");
 }

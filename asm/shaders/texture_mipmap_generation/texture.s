@@ -1,101 +1,114 @@
 ; SPIR-V
 ; Version: 1.0
 ; Generator: Google Shaderc over Glslang; 10
-; Bound: 57
+; Bound: 61
 ; Schema: 0
                OpCapability Shader
           %1 = OpExtInstImport "GLSL.std.450"
                OpMemoryModel Logical GLSL450
-               OpEntryPoint Fragment %4 "main" %37 %50
-               OpExecutionMode %4 OriginUpperLeft
+               OpEntryPoint Vertex %4 "main" %9 %11 %27 %44 %60
                OpSource GLSL 450
                OpSourceExtension "GL_GOOGLE_cpp_style_line_directive"
                OpSourceExtension "GL_GOOGLE_include_directive"
                OpName %4 "main"
-               OpName %9 "color"
-               OpName %12 "textureColor"
-               OpName %19 "samplers"
-               OpName %23 "UBO"
-               OpMemberName %23 0 "projection"
-               OpMemberName %23 1 "modelview"
-               OpMemberName %23 2 "lodBias"
-               OpMemberName %23 3 "samplerIndex"
-               OpName %25 "ubo"
-               OpName %37 "inUV"
-               OpName %50 "outFragColor"
-               OpDecorate %12 DescriptorSet 0
-               OpDecorate %12 Binding 1
-               OpDecorate %19 DescriptorSet 0
-               OpDecorate %19 Binding 2
-               OpMemberDecorate %23 0 ColMajor
-               OpMemberDecorate %23 0 Offset 0
-               OpMemberDecorate %23 0 MatrixStride 16
-               OpMemberDecorate %23 1 ColMajor
-               OpMemberDecorate %23 1 Offset 64
-               OpMemberDecorate %23 1 MatrixStride 16
-               OpMemberDecorate %23 2 Offset 128
-               OpMemberDecorate %23 3 Offset 132
-               OpDecorate %23 Block
-               OpDecorate %25 DescriptorSet 0
-               OpDecorate %25 Binding 0
-               OpDecorate %37 Location 0
-               OpDecorate %50 Location 0
+               OpName %9 "outUV"
+               OpName %11 "inUV"
+               OpName %15 "worldPos"
+               OpName %19 "UBO"
+               OpMemberName %19 0 "projection"
+               OpMemberName %19 1 "modelview"
+               OpMemberName %19 2 "lodBias"
+               OpMemberName %19 3 "samplerIndex"
+               OpName %21 "ubo"
+               OpName %27 "inPos"
+               OpName %42 "gl_PerVertex"
+               OpMemberName %42 0 "gl_Position"
+               OpMemberName %42 1 "gl_PointSize"
+               OpMemberName %42 2 "gl_ClipDistance"
+               OpMemberName %42 3 "gl_CullDistance"
+               OpName %44 ""
+               OpName %60 "outNormal"
+               OpDecorate %9 Location 0
+               OpDecorate %11 Location 1
+               OpMemberDecorate %19 0 ColMajor
+               OpMemberDecorate %19 0 Offset 0
+               OpMemberDecorate %19 0 MatrixStride 16
+               OpMemberDecorate %19 1 ColMajor
+               OpMemberDecorate %19 1 Offset 64
+               OpMemberDecorate %19 1 MatrixStride 16
+               OpMemberDecorate %19 2 Offset 128
+               OpMemberDecorate %19 3 Offset 132
+               OpDecorate %19 Block
+               OpDecorate %21 DescriptorSet 0
+               OpDecorate %21 Binding 0
+               OpDecorate %27 Location 0
+               OpMemberDecorate %42 0 BuiltIn Position
+               OpMemberDecorate %42 1 BuiltIn PointSize
+               OpMemberDecorate %42 2 BuiltIn ClipDistance
+               OpMemberDecorate %42 3 BuiltIn CullDistance
+               OpDecorate %42 Block
+               OpDecorate %60 Location 3
           %2 = OpTypeVoid
           %3 = OpTypeFunction %2
           %6 = OpTypeFloat 32
-          %7 = OpTypeVector %6 3
-          %8 = OpTypePointer Function %7
-         %10 = OpTypeImage %6 2D 0 0 0 1 Unknown
-         %11 = OpTypePointer UniformConstant %10
-         %12 = OpVariable %11 UniformConstant
-         %14 = OpTypeSampler
-         %15 = OpTypeInt 32 0
-         %16 = OpConstant %15 3
-         %17 = OpTypeArray %14 %16
-         %18 = OpTypePointer UniformConstant %17
-         %19 = OpVariable %18 UniformConstant
-         %20 = OpTypeVector %6 4
-         %21 = OpTypeMatrix %20 4
-         %22 = OpTypeInt 32 1
-         %23 = OpTypeStruct %21 %21 %6 %22
-         %24 = OpTypePointer Uniform %23
-         %25 = OpVariable %24 Uniform
-         %26 = OpConstant %22 3
-         %27 = OpTypePointer Uniform %22
-         %30 = OpTypePointer UniformConstant %14
-         %33 = OpTypeSampledImage %10
-         %35 = OpTypeVector %6 2
-         %36 = OpTypePointer Input %35
-         %37 = OpVariable %36 Input
-         %39 = OpConstant %6 2
-         %40 = OpConstant %6 0.25
-         %41 = OpConstantComposite %35 %39 %40
-         %43 = OpConstant %22 2
-         %44 = OpTypePointer Uniform %6
-         %49 = OpTypePointer Output %20
-         %50 = OpVariable %49 Output
-         %52 = OpConstant %6 1
+          %7 = OpTypeVector %6 2
+          %8 = OpTypePointer Output %7
+          %9 = OpVariable %8 Output
+         %10 = OpTypePointer Input %7
+         %11 = OpVariable %10 Input
+         %13 = OpTypeVector %6 3
+         %14 = OpTypePointer Function %13
+         %16 = OpTypeVector %6 4
+         %17 = OpTypeMatrix %16 4
+         %18 = OpTypeInt 32 1
+         %19 = OpTypeStruct %17 %17 %6 %18
+         %20 = OpTypePointer Uniform %19
+         %21 = OpVariable %20 Uniform
+         %22 = OpConstant %18 1
+         %23 = OpTypePointer Uniform %17
+         %26 = OpTypePointer Input %13
+         %27 = OpVariable %26 Input
+         %29 = OpConstant %6 1
+         %39 = OpTypeInt 32 0
+         %40 = OpConstant %39 1
+         %41 = OpTypeArray %6 %40
+         %42 = OpTypeStruct %16 %6 %41 %41
+         %43 = OpTypePointer Output %42
+         %44 = OpVariable %43 Output
+         %45 = OpConstant %18 0
+         %57 = OpTypePointer Output %16
+         %59 = OpTypePointer Output %13
+         %60 = OpVariable %59 Output
           %4 = OpFunction %2 None %3
           %5 = OpLabel
-          %9 = OpVariable %8 Function
-         %13 = OpLoad %10 %12
-         %28 = OpAccessChain %27 %25 %26
-         %29 = OpLoad %22 %28
-         %31 = OpAccessChain %30 %19 %29
-         %32 = OpLoad %14 %31
-         %34 = OpSampledImage %33 %13 %32
-         %38 = OpLoad %35 %37
-         %42 = OpFMul %35 %38 %41
-         %45 = OpAccessChain %44 %25 %43
-         %46 = OpLoad %6 %45
-         %47 = OpImageSampleImplicitLod %20 %34 %42 Bias %46
-         %48 = OpVectorShuffle %7 %47 %47 0 1 2
-               OpStore %9 %48
-         %51 = OpLoad %7 %9
-         %53 = OpCompositeExtract %6 %51 0
-         %54 = OpCompositeExtract %6 %51 1
-         %55 = OpCompositeExtract %6 %51 2
-         %56 = OpCompositeConstruct %20 %53 %54 %55 %52
-               OpStore %50 %56
+         %15 = OpVariable %14 Function
+         %12 = OpLoad %7 %11
+               OpStore %9 %12
+         %24 = OpAccessChain %23 %21 %22
+         %25 = OpLoad %17 %24
+         %28 = OpLoad %13 %27
+         %30 = OpCompositeExtract %6 %28 0
+         %31 = OpCompositeExtract %6 %28 1
+         %32 = OpCompositeExtract %6 %28 2
+         %33 = OpCompositeConstruct %16 %30 %31 %32 %29
+         %34 = OpMatrixTimesVector %16 %25 %33
+         %35 = OpCompositeExtract %6 %34 0
+         %36 = OpCompositeExtract %6 %34 1
+         %37 = OpCompositeExtract %6 %34 2
+         %38 = OpCompositeConstruct %13 %35 %36 %37
+               OpStore %15 %38
+         %46 = OpAccessChain %23 %21 %45
+         %47 = OpLoad %17 %46
+         %48 = OpAccessChain %23 %21 %22
+         %49 = OpLoad %17 %48
+         %50 = OpMatrixTimesMatrix %17 %47 %49
+         %51 = OpLoad %13 %27
+         %52 = OpCompositeExtract %6 %51 0
+         %53 = OpCompositeExtract %6 %51 1
+         %54 = OpCompositeExtract %6 %51 2
+         %55 = OpCompositeConstruct %16 %52 %53 %54 %29
+         %56 = OpMatrixTimesVector %16 %50 %55
+         %58 = OpAccessChain %57 %44 %45
+               OpStore %58 %56
                OpReturn
                OpFunctionEnd

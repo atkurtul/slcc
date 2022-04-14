@@ -744,159 +744,26 @@ pub enum Opcode {
     OpGroupLogicalOrKHR(IdType, IdResult, ID, GroupOperation, ID) = 6407,
     OpGroupLogicalXorKHR(IdType, IdResult, ID, GroupOperation, ID) = 6408,
 }
-#[repr(u32)]
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum ImageOperands {
-    None = 0,
-    Bias(ID) = 1,
-    Lod(ID) = 2,
-    Grad(ID, ID) = 4,
-    ConstOffset(ID) = 8,
-    Offset(ID) = 16,
-    ConstOffsets(ID) = 32,
-    Sample(ID) = 64,
-    MinLod(ID) = 128,
-    MakeTexelAvailable(ID) = 256,
-    MakeTexelVisible(ID) = 512,
-    NonPrivateTexel = 1024,
-    VolatileTexel = 2048,
-    SignExtend = 4096,
-    ZeroExtend = 8192,
-    Nontemporal = 16384,
-    Offsets(ID) = 65536,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct ImageOperands(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum FPFastMathMode {
-    None = 0,
-    NotNaN = 1,
-    NotInf = 2,
-    NSZ = 4,
-    AllowRecip = 8,
-    Fast = 16,
-    AllowContractFastINTEL = 65536,
-    AllowReassocINTEL = 131072,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct FPFastMathMode(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum SelectionControl {
-    None = 0,
-    Flatten = 1,
-    DontFlatten = 2,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct SelectionControl(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum LoopControl {
-    None = 0,
-    Unroll = 1,
-    DontUnroll = 2,
-    DependencyInfinite = 4,
-    DependencyLength(u32) = 8,
-    MinIterations(u32) = 16,
-    MaxIterations(u32) = 32,
-    IterationMultiple(u32) = 64,
-    PeelCount(u32) = 128,
-    PartialCount(u32) = 256,
-    InitiationIntervalINTEL(u32) = 65536,
-    MaxConcurrencyINTEL(u32) = 131072,
-    DependencyArrayINTEL(u32) = 262144,
-    PipelineEnableINTEL(u32) = 524288,
-    LoopCoalesceINTEL(u32) = 1048576,
-    MaxInterleavingINTEL(u32) = 2097152,
-    SpeculatedIterationsINTEL(u32) = 4194304,
-    NoFusionINTEL(u32) = 8388608,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct LoopControl(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum FunctionControl {
-    None = 0,
-    Inline = 1,
-    DontInline = 2,
-    Pure = 4,
-    Const = 8,
-    OptNoneINTEL = 65536,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct FunctionControl(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum MemorySemantics {
-    Relaxed = 0,
-    Acquire = 2,
-    Release = 4,
-    AcquireRelease = 8,
-    SequentiallyConsistent = 16,
-    UniformMemory = 64,
-    SubgroupMemory = 128,
-    WorkgroupMemory = 256,
-    CrossWorkgroupMemory = 512,
-    AtomicCounterMemory = 1024,
-    ImageMemory = 2048,
-    OutputMemory = 4096,
-    MakeAvailable = 8192,
-    MakeVisible = 16384,
-    Volatile = 32768,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct MemorySemantics(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum MemoryAccess {
-    None = 0,
-    Volatile = 1,
-    Aligned(u32) = 2,
-    Nontemporal = 4,
-    MakePointerAvailable(ID) = 8,
-    MakePointerVisible(ID) = 16,
-    NonPrivatePointer = 32,
-    AliasScopeINTELMask(ID) = 65536,
-    NoAliasINTELMask(ID) = 131072,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct MemoryAccess(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum KernelProfilingInfo {
-    None = 0,
-    CmdExecTime = 1,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct KernelProfilingInfo(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum RayFlags {
-    NoneKHR = 0,
-    OpaqueKHR = 1,
-    NoOpaqueKHR = 2,
-    TerminateOnFirstHitKHR = 4,
-    SkipClosestHitShaderKHR = 8,
-    CullBackFacingTrianglesKHR = 16,
-    CullFrontFacingTrianglesKHR = 32,
-    CullOpaqueKHR = 64,
-    CullNoOpaqueKHR = 128,
-    SkipTrianglesKHR = 256,
-    SkipAABBsKHR = 512,
-    #[default]
-    INVALID = u32::MAX,
-}
-#[repr(u32)]
+pub struct RayFlags(pub u32);
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub enum FragmentShadingRate {
-    Vertical2Pixels = 1,
-    Vertical4Pixels = 2,
-    Horizontal2Pixels = 4,
-    Horizontal4Pixels = 8,
-    #[default]
-    INVALID = u32::MAX,
-}
+pub struct FragmentShadingRate(pub u32);
 #[repr(u32)]
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub enum SourceLanguage {
@@ -13553,485 +13420,353 @@ impl ImageOperands {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const None: Self = Self(0);
+    const Bias: Self = Self(1);
+    const Lod: Self = Self(2);
+    const Grad: Self = Self(4);
+    const ConstOffset: Self = Self(8);
+    const Offset: Self = Self(16);
+    const ConstOffsets: Self = Self(32);
+    const Sample: Self = Self(64);
+    const MinLod: Self = Self(128);
+    const MakeTexelAvailable: Self = Self(256);
+    const MakeTexelVisible: Self = Self(512);
+    const NonPrivateTexel: Self = Self(1024);
+    const VolatileTexel: Self = Self(2048);
+    const SignExtend: Self = Self(4096);
+    const ZeroExtend: Self = Self(8192);
+    const Nontemporal: Self = Self(16384);
+    const Offsets: Self = Self(65536);
+}
+impl std::ops::BitOr<ImageOperands> for ImageOperands {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<ImageOperands> for ImageOperands {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for ImageOperands {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use ImageOperands::*;
         sink.push(self.opcode());
-        match self {
-            Bias(x0) => {
-                x0.write_word(sink);
-            }
-            Lod(x0) => {
-                x0.write_word(sink);
-            }
-            Grad(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-            }
-            ConstOffset(x0) => {
-                x0.write_word(sink);
-            }
-            Offset(x0) => {
-                x0.write_word(sink);
-            }
-            ConstOffsets(x0) => {
-                x0.write_word(sink);
-            }
-            Sample(x0) => {
-                x0.write_word(sink);
-            }
-            MinLod(x0) => {
-                x0.write_word(sink);
-            }
-            MakeTexelAvailable(x0) => {
-                x0.write_word(sink);
-            }
-            MakeTexelVisible(x0) => {
-                x0.write_word(sink);
-            }
-            Offsets(x0) => {
-                x0.write_word(sink);
-            }
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use ImageOperands::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => None,
-            1 => {
-                let x0 = Asm::read_word(chunk, idx);
-                Bias(x0)
-            }
-            2 => {
-                let x0 = Asm::read_word(chunk, idx);
-                Lod(x0)
-            }
-            4 => {
-                let x0 = Asm::read_word(chunk, idx);
-                let x1 = Asm::read_word(chunk, idx);
-                Grad(x0, x1)
-            }
-            8 => {
-                let x0 = Asm::read_word(chunk, idx);
-                ConstOffset(x0)
-            }
-            16 => {
-                let x0 = Asm::read_word(chunk, idx);
-                Offset(x0)
-            }
-            32 => {
-                let x0 = Asm::read_word(chunk, idx);
-                ConstOffsets(x0)
-            }
-            64 => {
-                let x0 = Asm::read_word(chunk, idx);
-                Sample(x0)
-            }
-            128 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MinLod(x0)
-            }
-            256 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MakeTexelAvailable(x0)
-            }
-            512 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MakeTexelVisible(x0)
-            }
-            1024 => NonPrivateTexel,
-            2048 => VolatileTexel,
-            4096 => SignExtend,
-            8192 => ZeroExtend,
-            16384 => Nontemporal,
-            65536 => {
-                let x0 = Asm::read_word(chunk, idx);
-                Offsets(x0)
-            }
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl FPFastMathMode {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const None: Self = Self(0);
+    const NotNaN: Self = Self(1);
+    const NotInf: Self = Self(2);
+    const NSZ: Self = Self(4);
+    const AllowRecip: Self = Self(8);
+    const Fast: Self = Self(16);
+    const AllowContractFastINTEL: Self = Self(65536);
+    const AllowReassocINTEL: Self = Self(131072);
+}
+impl std::ops::BitOr<FPFastMathMode> for FPFastMathMode {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<FPFastMathMode> for FPFastMathMode {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for FPFastMathMode {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use FPFastMathMode::*;
         sink.push(self.opcode());
-        match self {
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use FPFastMathMode::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => None,
-            1 => NotNaN,
-            2 => NotInf,
-            4 => NSZ,
-            8 => AllowRecip,
-            16 => Fast,
-            65536 => AllowContractFastINTEL,
-            131072 => AllowReassocINTEL,
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl SelectionControl {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const None: Self = Self(0);
+    const Flatten: Self = Self(1);
+    const DontFlatten: Self = Self(2);
+}
+impl std::ops::BitOr<SelectionControl> for SelectionControl {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<SelectionControl> for SelectionControl {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for SelectionControl {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use SelectionControl::*;
         sink.push(self.opcode());
-        match self {
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use SelectionControl::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => None,
-            1 => Flatten,
-            2 => DontFlatten,
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl LoopControl {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const None: Self = Self(0);
+    const Unroll: Self = Self(1);
+    const DontUnroll: Self = Self(2);
+    const DependencyInfinite: Self = Self(4);
+    const DependencyLength: Self = Self(8);
+    const MinIterations: Self = Self(16);
+    const MaxIterations: Self = Self(32);
+    const IterationMultiple: Self = Self(64);
+    const PeelCount: Self = Self(128);
+    const PartialCount: Self = Self(256);
+    const InitiationIntervalINTEL: Self = Self(65536);
+    const MaxConcurrencyINTEL: Self = Self(131072);
+    const DependencyArrayINTEL: Self = Self(262144);
+    const PipelineEnableINTEL: Self = Self(524288);
+    const LoopCoalesceINTEL: Self = Self(1048576);
+    const MaxInterleavingINTEL: Self = Self(2097152);
+    const SpeculatedIterationsINTEL: Self = Self(4194304);
+    const NoFusionINTEL: Self = Self(8388608);
+}
+impl std::ops::BitOr<LoopControl> for LoopControl {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<LoopControl> for LoopControl {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for LoopControl {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use LoopControl::*;
         sink.push(self.opcode());
-        match self {
-            DependencyLength(x0) => {
-                x0.write_word(sink);
-            }
-            MinIterations(x0) => {
-                x0.write_word(sink);
-            }
-            MaxIterations(x0) => {
-                x0.write_word(sink);
-            }
-            IterationMultiple(x0) => {
-                x0.write_word(sink);
-            }
-            PeelCount(x0) => {
-                x0.write_word(sink);
-            }
-            PartialCount(x0) => {
-                x0.write_word(sink);
-            }
-            InitiationIntervalINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            MaxConcurrencyINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            DependencyArrayINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            PipelineEnableINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            LoopCoalesceINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            MaxInterleavingINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            SpeculatedIterationsINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            NoFusionINTEL(x0) => {
-                x0.write_word(sink);
-            }
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use LoopControl::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => None,
-            1 => Unroll,
-            2 => DontUnroll,
-            4 => DependencyInfinite,
-            8 => {
-                let x0 = Asm::read_word(chunk, idx);
-                DependencyLength(x0)
-            }
-            16 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MinIterations(x0)
-            }
-            32 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MaxIterations(x0)
-            }
-            64 => {
-                let x0 = Asm::read_word(chunk, idx);
-                IterationMultiple(x0)
-            }
-            128 => {
-                let x0 = Asm::read_word(chunk, idx);
-                PeelCount(x0)
-            }
-            256 => {
-                let x0 = Asm::read_word(chunk, idx);
-                PartialCount(x0)
-            }
-            65536 => {
-                let x0 = Asm::read_word(chunk, idx);
-                InitiationIntervalINTEL(x0)
-            }
-            131072 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MaxConcurrencyINTEL(x0)
-            }
-            262144 => {
-                let x0 = Asm::read_word(chunk, idx);
-                DependencyArrayINTEL(x0)
-            }
-            524288 => {
-                let x0 = Asm::read_word(chunk, idx);
-                PipelineEnableINTEL(x0)
-            }
-            1048576 => {
-                let x0 = Asm::read_word(chunk, idx);
-                LoopCoalesceINTEL(x0)
-            }
-            2097152 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MaxInterleavingINTEL(x0)
-            }
-            4194304 => {
-                let x0 = Asm::read_word(chunk, idx);
-                SpeculatedIterationsINTEL(x0)
-            }
-            8388608 => {
-                let x0 = Asm::read_word(chunk, idx);
-                NoFusionINTEL(x0)
-            }
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl FunctionControl {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const None: Self = Self(0);
+    const Inline: Self = Self(1);
+    const DontInline: Self = Self(2);
+    const Pure: Self = Self(4);
+    const Const: Self = Self(8);
+    const OptNoneINTEL: Self = Self(65536);
+}
+impl std::ops::BitOr<FunctionControl> for FunctionControl {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<FunctionControl> for FunctionControl {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for FunctionControl {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use FunctionControl::*;
         sink.push(self.opcode());
-        match self {
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use FunctionControl::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => None,
-            1 => Inline,
-            2 => DontInline,
-            4 => Pure,
-            8 => Const,
-            65536 => OptNoneINTEL,
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl MemorySemantics {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const Relaxed: Self = Self(0);
+    const Acquire: Self = Self(2);
+    const Release: Self = Self(4);
+    const AcquireRelease: Self = Self(8);
+    const SequentiallyConsistent: Self = Self(16);
+    const UniformMemory: Self = Self(64);
+    const SubgroupMemory: Self = Self(128);
+    const WorkgroupMemory: Self = Self(256);
+    const CrossWorkgroupMemory: Self = Self(512);
+    const AtomicCounterMemory: Self = Self(1024);
+    const ImageMemory: Self = Self(2048);
+    const OutputMemory: Self = Self(4096);
+    const MakeAvailable: Self = Self(8192);
+    const MakeVisible: Self = Self(16384);
+    const Volatile: Self = Self(32768);
+}
+impl std::ops::BitOr<MemorySemantics> for MemorySemantics {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<MemorySemantics> for MemorySemantics {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for MemorySemantics {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use MemorySemantics::*;
         sink.push(self.opcode());
-        match self {
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use MemorySemantics::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => Relaxed,
-            2 => Acquire,
-            4 => Release,
-            8 => AcquireRelease,
-            16 => SequentiallyConsistent,
-            64 => UniformMemory,
-            128 => SubgroupMemory,
-            256 => WorkgroupMemory,
-            512 => CrossWorkgroupMemory,
-            1024 => AtomicCounterMemory,
-            2048 => ImageMemory,
-            4096 => OutputMemory,
-            8192 => MakeAvailable,
-            16384 => MakeVisible,
-            32768 => Volatile,
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl MemoryAccess {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const None: Self = Self(0);
+    const Volatile: Self = Self(1);
+    const Aligned: Self = Self(2);
+    const Nontemporal: Self = Self(4);
+    const MakePointerAvailable: Self = Self(8);
+    const MakePointerVisible: Self = Self(16);
+    const NonPrivatePointer: Self = Self(32);
+    const AliasScopeINTELMask: Self = Self(65536);
+    const NoAliasINTELMask: Self = Self(131072);
+}
+impl std::ops::BitOr<MemoryAccess> for MemoryAccess {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<MemoryAccess> for MemoryAccess {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for MemoryAccess {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use MemoryAccess::*;
         sink.push(self.opcode());
-        match self {
-            Aligned(x0) => {
-                x0.write_word(sink);
-            }
-            MakePointerAvailable(x0) => {
-                x0.write_word(sink);
-            }
-            MakePointerVisible(x0) => {
-                x0.write_word(sink);
-            }
-            AliasScopeINTELMask(x0) => {
-                x0.write_word(sink);
-            }
-            NoAliasINTELMask(x0) => {
-                x0.write_word(sink);
-            }
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use MemoryAccess::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => None,
-            1 => Volatile,
-            2 => {
-                let x0 = Asm::read_word(chunk, idx);
-                Aligned(x0)
-            }
-            4 => Nontemporal,
-            8 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MakePointerAvailable(x0)
-            }
-            16 => {
-                let x0 = Asm::read_word(chunk, idx);
-                MakePointerVisible(x0)
-            }
-            32 => NonPrivatePointer,
-            65536 => {
-                let x0 = Asm::read_word(chunk, idx);
-                AliasScopeINTELMask(x0)
-            }
-            131072 => {
-                let x0 = Asm::read_word(chunk, idx);
-                NoAliasINTELMask(x0)
-            }
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl KernelProfilingInfo {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const None: Self = Self(0);
+    const CmdExecTime: Self = Self(1);
+}
+impl std::ops::BitOr<KernelProfilingInfo> for KernelProfilingInfo {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<KernelProfilingInfo> for KernelProfilingInfo {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for KernelProfilingInfo {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use KernelProfilingInfo::*;
         sink.push(self.opcode());
-        match self {
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use KernelProfilingInfo::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => None,
-            1 => CmdExecTime,
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl RayFlags {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const NoneKHR: Self = Self(0);
+    const OpaqueKHR: Self = Self(1);
+    const NoOpaqueKHR: Self = Self(2);
+    const TerminateOnFirstHitKHR: Self = Self(4);
+    const SkipClosestHitShaderKHR: Self = Self(8);
+    const CullBackFacingTrianglesKHR: Self = Self(16);
+    const CullFrontFacingTrianglesKHR: Self = Self(32);
+    const CullOpaqueKHR: Self = Self(64);
+    const CullNoOpaqueKHR: Self = Self(128);
+    const SkipTrianglesKHR: Self = Self(256);
+    const SkipAABBsKHR: Self = Self(512);
+}
+impl std::ops::BitOr<RayFlags> for RayFlags {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<RayFlags> for RayFlags {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for RayFlags {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use RayFlags::*;
         sink.push(self.opcode());
-        match self {
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use RayFlags::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            0 => NoneKHR,
-            1 => OpaqueKHR,
-            2 => NoOpaqueKHR,
-            4 => TerminateOnFirstHitKHR,
-            8 => SkipClosestHitShaderKHR,
-            16 => CullBackFacingTrianglesKHR,
-            32 => CullFrontFacingTrianglesKHR,
-            64 => CullOpaqueKHR,
-            128 => CullNoOpaqueKHR,
-            256 => SkipTrianglesKHR,
-            512 => SkipAABBsKHR,
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl FragmentShadingRate {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
+    const Vertical2Pixels: Self = Self(1);
+    const Vertical4Pixels: Self = Self(2);
+    const Horizontal2Pixels: Self = Self(4);
+    const Horizontal4Pixels: Self = Self(8);
+}
+impl std::ops::BitOr<FragmentShadingRate> for FragmentShadingRate {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
+}
+impl std::ops::BitAnd<FragmentShadingRate> for FragmentShadingRate {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self {
+        Self(self.0 & rhs.0)
+    }
 }
 impl Asm for FragmentShadingRate {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use FragmentShadingRate::*;
         sink.push(self.opcode());
-        match self {
-            what => panic!("{:?}", what),
-        }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use FragmentShadingRate::*;
         *idx += 1;
-        match chunk[*idx as usize - 1] {
-            1 => Vertical2Pixels,
-            2 => Vertical4Pixels,
-            4 => Horizontal2Pixels,
-            8 => Horizontal4Pixels,
-            what => panic!("{:?}", what),
-        }
+        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
 impl SourceLanguage {
@@ -14041,15 +13776,15 @@ impl SourceLanguage {
 }
 impl Asm for SourceLanguage {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use SourceLanguage::*;
         sink.push(self.opcode());
+        use SourceLanguage::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use SourceLanguage::*;
         *idx += 1;
+        use SourceLanguage::*;
         match chunk[*idx as usize - 1] {
             0 => Unknown,
             1 => ESSL,
@@ -14070,15 +13805,15 @@ impl ExecutionModel {
 }
 impl Asm for ExecutionModel {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use ExecutionModel::*;
         sink.push(self.opcode());
+        use ExecutionModel::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use ExecutionModel::*;
         *idx += 1;
+        use ExecutionModel::*;
         match chunk[*idx as usize - 1] {
             0 => Vertex,
             1 => TessellationControl,
@@ -14106,15 +13841,15 @@ impl AddressingModel {
 }
 impl Asm for AddressingModel {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use AddressingModel::*;
         sink.push(self.opcode());
+        use AddressingModel::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use AddressingModel::*;
         *idx += 1;
+        use AddressingModel::*;
         match chunk[*idx as usize - 1] {
             0 => Logical,
             1 => Physical32,
@@ -14131,15 +13866,15 @@ impl MemoryModel {
 }
 impl Asm for MemoryModel {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use MemoryModel::*;
         sink.push(self.opcode());
+        use MemoryModel::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use MemoryModel::*;
         *idx += 1;
+        use MemoryModel::*;
         match chunk[*idx as usize - 1] {
             0 => Simple,
             1 => GLSL450,
@@ -14156,8 +13891,8 @@ impl ExecutionMode {
 }
 impl Asm for ExecutionMode {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use ExecutionMode::*;
         sink.push(self.opcode());
+        use ExecutionMode::*;
         match self {
             Invocations(x0) => {
                 x0.write_word(sink);
@@ -14251,8 +13986,8 @@ impl Asm for ExecutionMode {
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use ExecutionMode::*;
         *idx += 1;
+        use ExecutionMode::*;
         match chunk[*idx as usize - 1] {
             0 => {
                 let x0 = Asm::read_word(chunk, idx);
@@ -14421,15 +14156,15 @@ impl StorageClass {
 }
 impl Asm for StorageClass {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use StorageClass::*;
         sink.push(self.opcode());
+        use StorageClass::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use StorageClass::*;
         *idx += 1;
+        use StorageClass::*;
         match chunk[*idx as usize - 1] {
             0 => UniformConstant,
             1 => Input,
@@ -14465,15 +14200,15 @@ impl Dim {
 }
 impl Asm for Dim {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use Dim::*;
         sink.push(self.opcode());
+        use Dim::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use Dim::*;
         *idx += 1;
+        use Dim::*;
         match chunk[*idx as usize - 1] {
             0 => _1D,
             1 => _2D,
@@ -14493,15 +14228,15 @@ impl SamplerAddressingMode {
 }
 impl Asm for SamplerAddressingMode {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use SamplerAddressingMode::*;
         sink.push(self.opcode());
+        use SamplerAddressingMode::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use SamplerAddressingMode::*;
         *idx += 1;
+        use SamplerAddressingMode::*;
         match chunk[*idx as usize - 1] {
             0 => None,
             1 => ClampToEdge,
@@ -14519,15 +14254,15 @@ impl SamplerFilterMode {
 }
 impl Asm for SamplerFilterMode {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use SamplerFilterMode::*;
         sink.push(self.opcode());
+        use SamplerFilterMode::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use SamplerFilterMode::*;
         *idx += 1;
+        use SamplerFilterMode::*;
         match chunk[*idx as usize - 1] {
             0 => Nearest,
             1 => Linear,
@@ -14542,15 +14277,15 @@ impl ImageFormat {
 }
 impl Asm for ImageFormat {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use ImageFormat::*;
         sink.push(self.opcode());
+        use ImageFormat::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use ImageFormat::*;
         *idx += 1;
+        use ImageFormat::*;
         match chunk[*idx as usize - 1] {
             0 => Unknown,
             1 => Rgba32f,
@@ -14605,15 +14340,15 @@ impl ImageChannelOrder {
 }
 impl Asm for ImageChannelOrder {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use ImageChannelOrder::*;
         sink.push(self.opcode());
+        use ImageChannelOrder::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use ImageChannelOrder::*;
         *idx += 1;
+        use ImageChannelOrder::*;
         match chunk[*idx as usize - 1] {
             0 => R,
             1 => A,
@@ -14646,15 +14381,15 @@ impl ImageChannelDataType {
 }
 impl Asm for ImageChannelDataType {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use ImageChannelDataType::*;
         sink.push(self.opcode());
+        use ImageChannelDataType::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use ImageChannelDataType::*;
         *idx += 1;
+        use ImageChannelDataType::*;
         match chunk[*idx as usize - 1] {
             0 => SnormInt8,
             1 => SnormInt16,
@@ -14684,15 +14419,15 @@ impl FPRoundingMode {
 }
 impl Asm for FPRoundingMode {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use FPRoundingMode::*;
         sink.push(self.opcode());
+        use FPRoundingMode::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use FPRoundingMode::*;
         *idx += 1;
+        use FPRoundingMode::*;
         match chunk[*idx as usize - 1] {
             0 => RTE,
             1 => RTZ,
@@ -14709,15 +14444,15 @@ impl FPDenormMode {
 }
 impl Asm for FPDenormMode {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use FPDenormMode::*;
         sink.push(self.opcode());
+        use FPDenormMode::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use FPDenormMode::*;
         *idx += 1;
+        use FPDenormMode::*;
         match chunk[*idx as usize - 1] {
             0 => Preserve,
             1 => FlushToZero,
@@ -14732,15 +14467,15 @@ impl QuantizationModes {
 }
 impl Asm for QuantizationModes {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use QuantizationModes::*;
         sink.push(self.opcode());
+        use QuantizationModes::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use QuantizationModes::*;
         *idx += 1;
+        use QuantizationModes::*;
         match chunk[*idx as usize - 1] {
             0 => TRN,
             1 => TRN_ZERO,
@@ -14761,15 +14496,15 @@ impl FPOperationMode {
 }
 impl Asm for FPOperationMode {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use FPOperationMode::*;
         sink.push(self.opcode());
+        use FPOperationMode::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use FPOperationMode::*;
         *idx += 1;
+        use FPOperationMode::*;
         match chunk[*idx as usize - 1] {
             0 => IEEE,
             1 => ALT,
@@ -14784,15 +14519,15 @@ impl OverflowModes {
 }
 impl Asm for OverflowModes {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use OverflowModes::*;
         sink.push(self.opcode());
+        use OverflowModes::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use OverflowModes::*;
         *idx += 1;
+        use OverflowModes::*;
         match chunk[*idx as usize - 1] {
             0 => WRAP,
             1 => SAT,
@@ -14809,15 +14544,15 @@ impl LinkageType {
 }
 impl Asm for LinkageType {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use LinkageType::*;
         sink.push(self.opcode());
+        use LinkageType::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use LinkageType::*;
         *idx += 1;
+        use LinkageType::*;
         match chunk[*idx as usize - 1] {
             0 => Export,
             1 => Import,
@@ -14833,15 +14568,15 @@ impl AccessQualifier {
 }
 impl Asm for AccessQualifier {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use AccessQualifier::*;
         sink.push(self.opcode());
+        use AccessQualifier::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use AccessQualifier::*;
         *idx += 1;
+        use AccessQualifier::*;
         match chunk[*idx as usize - 1] {
             0 => ReadOnly,
             1 => WriteOnly,
@@ -14857,15 +14592,15 @@ impl FunctionParameterAttribute {
 }
 impl Asm for FunctionParameterAttribute {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use FunctionParameterAttribute::*;
         sink.push(self.opcode());
+        use FunctionParameterAttribute::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use FunctionParameterAttribute::*;
         *idx += 1;
+        use FunctionParameterAttribute::*;
         match chunk[*idx as usize - 1] {
             0 => Zext,
             1 => Sext,
@@ -14886,8 +14621,8 @@ impl Decoration {
 }
 impl Asm for Decoration {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use Decoration::*;
         sink.push(self.opcode());
+        use Decoration::*;
         match self {
             SpecId(x0) => {
                 x0.write_word(sink);
@@ -15042,8 +14777,8 @@ impl Asm for Decoration {
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use Decoration::*;
         *idx += 1;
+        use Decoration::*;
         match chunk[*idx as usize - 1] {
             0 => RelaxedPrecision,
             1 => {
@@ -15310,15 +15045,15 @@ impl BuiltIn {
 }
 impl Asm for BuiltIn {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use BuiltIn::*;
         sink.push(self.opcode());
+        use BuiltIn::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use BuiltIn::*;
         *idx += 1;
+        use BuiltIn::*;
         match chunk[*idx as usize - 1] {
             0 => Position,
             1 => PointSize,
@@ -15430,15 +15165,15 @@ impl Scope {
 }
 impl Asm for Scope {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use Scope::*;
         sink.push(self.opcode());
+        use Scope::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use Scope::*;
         *idx += 1;
+        use Scope::*;
         match chunk[*idx as usize - 1] {
             0 => CrossDevice,
             1 => Device,
@@ -15458,15 +15193,15 @@ impl GroupOperation {
 }
 impl Asm for GroupOperation {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use GroupOperation::*;
         sink.push(self.opcode());
+        use GroupOperation::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use GroupOperation::*;
         *idx += 1;
+        use GroupOperation::*;
         match chunk[*idx as usize - 1] {
             0 => Reduce,
             1 => InclusiveScan,
@@ -15486,15 +15221,15 @@ impl KernelEnqueueFlags {
 }
 impl Asm for KernelEnqueueFlags {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use KernelEnqueueFlags::*;
         sink.push(self.opcode());
+        use KernelEnqueueFlags::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use KernelEnqueueFlags::*;
         *idx += 1;
+        use KernelEnqueueFlags::*;
         match chunk[*idx as usize - 1] {
             0 => NoWait,
             1 => WaitKernel,
@@ -15510,15 +15245,15 @@ impl Capability {
 }
 impl Asm for Capability {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use Capability::*;
         sink.push(self.opcode());
+        use Capability::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use Capability::*;
         *idx += 1;
+        use Capability::*;
         match chunk[*idx as usize - 1] {
             0 => Matrix,
             1 => Shader,
@@ -15728,15 +15463,15 @@ impl RayQueryIntersection {
 }
 impl Asm for RayQueryIntersection {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use RayQueryIntersection::*;
         sink.push(self.opcode());
+        use RayQueryIntersection::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use RayQueryIntersection::*;
         *idx += 1;
+        use RayQueryIntersection::*;
         match chunk[*idx as usize - 1] {
             0 => RayQueryCandidateIntersectionKHR,
             1 => RayQueryCommittedIntersectionKHR,
@@ -15751,15 +15486,15 @@ impl RayQueryCommittedIntersectionType {
 }
 impl Asm for RayQueryCommittedIntersectionType {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use RayQueryCommittedIntersectionType::*;
         sink.push(self.opcode());
+        use RayQueryCommittedIntersectionType::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use RayQueryCommittedIntersectionType::*;
         *idx += 1;
+        use RayQueryCommittedIntersectionType::*;
         match chunk[*idx as usize - 1] {
             0 => RayQueryCommittedIntersectionNoneKHR,
             1 => RayQueryCommittedIntersectionTriangleKHR,
@@ -15775,15 +15510,15 @@ impl RayQueryCandidateIntersectionType {
 }
 impl Asm for RayQueryCandidateIntersectionType {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use RayQueryCandidateIntersectionType::*;
         sink.push(self.opcode());
+        use RayQueryCandidateIntersectionType::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use RayQueryCandidateIntersectionType::*;
         *idx += 1;
+        use RayQueryCandidateIntersectionType::*;
         match chunk[*idx as usize - 1] {
             0 => RayQueryCandidateIntersectionTriangleKHR,
             1 => RayQueryCandidateIntersectionAABBKHR,
@@ -15798,15 +15533,15 @@ impl PackedVectorFormat {
 }
 impl Asm for PackedVectorFormat {
     fn write_word(&self, sink: &mut Vec<u32>) {
-        use PackedVectorFormat::*;
         sink.push(self.opcode());
+        use PackedVectorFormat::*;
         match self {
             what => panic!("{:?}", what),
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        use PackedVectorFormat::*;
         *idx += 1;
+        use PackedVectorFormat::*;
         match chunk[*idx as usize - 1] {
             0 => PackedVectorFormat4x8Bit,
             what => panic!("{:?}", what),

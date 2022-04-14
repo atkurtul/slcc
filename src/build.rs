@@ -154,6 +154,14 @@ impl Enumerant {
         }
     }
 
+    fn write_bitfield(&self) -> TokenStream {
+        let name = self.opname();
+        let opc = Literal::u32_unsuffixed(self.value());
+        quote! {
+          const #name: Self = Self(#opc);
+        }
+    }
+
     fn write_read(&self) -> TokenStream {
         let name = self.opname();
         let opc = Literal::u32_unsuffixed(self.value());
@@ -228,34 +236,66 @@ impl Operand {
             return quote! {};
         }
         let vars: Vec<_> = (0..30usize).map(|i| format_ident!("x{}", i)).collect();
-        let matcher = self.enumerants.iter().map(|e| e.write_match());
-        let reader = self.enumerants.iter().map(|e| e.write_read());
-
         let name = format_ident!("{}", self.kind.0);
-        quote! {
-          impl #name {
-            pub fn opcode(&self) -> u32 {
-              unsafe { std::mem::transmute_copy(self) }
-            }
-          }
+        let ximpl =
+            quote! {pub fn opcode(&self) -> u32 {unsafe { std::mem::transmute_copy(self) }}};
 
+        let (ximpl, matcher, reader) = if !self.is_bitfield() {
+            let matcher = self.enumerants.iter().map(|e| e.write_match());
+            let reader = self.enumerants.iter().map(|e| e.write_read());
+            (
+                quote! { impl #name { #ximpl } },
+                quote! {
+                  use #name::*;
+                  match self {
+                    #(#matcher)*
+                    what => panic!("{:?}", what),
+                  }
+                },
+                quote! {
+                  use #name::*;
+                  match chunk[*idx as usize - 1] {
+                    #(#reader)*
+                    what => panic!("{:?}", what),
+                  }
+                },
+            )
+        } else {
+            let fields = self.enumerants.iter().map(|e| e.write_bitfield());
+            (
+                quote! {
+                  impl #name { #ximpl #(#fields)* }
+                  impl std::ops::BitOr<#name> for #name {
+                      type Output = Self;
+                      fn bitor(self, rhs: Self) -> Self {
+                          Self(self.0 | rhs.0)
+                      }
+                  }
+                  impl std::ops::BitAnd<#name> for #name {
+                      type Output = Self;
+                      fn bitand(self, rhs: Self) -> Self {
+                          Self(self.0 & rhs.0)
+                      }
+                  }
+                },
+                quote! {},
+                quote! {
+                  unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
+                },
+            )
+        };
+
+        quote! {
+          #ximpl
           impl Asm for #name {
             fn write_word(&self, sink: &mut Vec<u32>) {
-              use #name ::*;
               sink.push(self.opcode());
-              match self {
-                #(#matcher)*
-                what => panic!("{:?}", what),
-              }
+              #matcher
             }
 
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-              use #name ::*;
               *idx += 1;
-              match chunk[*idx as usize - 1] {
-                #(#reader)*
-                what => panic!("{:?}", what),
-              }
+              #reader
             }
           }
         }
@@ -283,20 +323,26 @@ impl Operand {
             derive.push("Copy");
         }
         let derive = derive.iter().map(|d| format_ident!("{}", d));
-
-        quote! {
-          #[repr(u32)]
-          #[derive(#(#derive),*)]
-          pub enum #name {
-            #(#enumerants)*
-            #[default]
-            INVALID = u32::MAX,
-          }
+        if self.is_bitfield() {
+            quote! {
+              #[derive(#(#derive),*)]
+              pub struct #name(pub u32);
+            }
+        } else {
+            quote! {
+              #[repr(u32)]
+              #[derive(#(#derive),*)]
+              pub enum #name {
+                #(#enumerants)*
+                #[default]
+                INVALID = u32::MAX,
+              }
+            }
         }
     }
 
     fn write_test(&self) -> TokenStream {
-        if self.enumerants.is_empty() {
+        if self.enumerants.is_empty() || self.is_bitfield() {
             return quote! {};
         }
         let name = format_ident!("{}", self.kind.0);
@@ -509,12 +555,11 @@ impl Grammar {
 
         self.operands.iter_mut().for_each(Operand::init);
 
-        for op in &self.operands {
-            if op.is_bitfield() {
-              println!("{}", op.kind.0);
-            }
-        }
-        panic!();
+        // for op in &self.operands {
+        //     if op.is_bitfield() {
+        //       println!("{}", op.kind.0);
+        //     }
+        // }
     }
 
     fn write(&self) -> TokenStream {
@@ -524,6 +569,7 @@ impl Grammar {
             .operands
             .iter()
             .map(|o| o.write(&mut trivials, &self.operands));
+
         let operand_impls = self.operands.iter().map(Operand::write_impl);
         let instructions = self.instructions.iter().map(|e| e.write());
         let instruction_writers = self.instructions.iter().map(Instruction::write_impl);
