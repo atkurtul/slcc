@@ -12,7 +12,6 @@ use std::io::{self, Write};
 use std::iter;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::sync::Arc;
 
 pub type Map<K, V> = FxHashMap<K, V>;
 pub type Set<K> = FxHashSet<K>;
@@ -160,7 +159,7 @@ impl Enumerant {
         let name = self.opname();
         let opc = Literal::u32_unsuffixed(self.value());
         quote! {
-          const #name: Self = Self(#opc);
+          pub const #name: Self = Self(#opc);
         }
     }
 

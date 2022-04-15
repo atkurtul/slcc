@@ -770,21 +770,21 @@ pub enum ImageOperandsBits {
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct FPFastMathMode(pub u32);
 impl FPFastMathMode {
-    const None: Self = Self(0);
-    const NotNaN: Self = Self(1);
-    const NotInf: Self = Self(2);
-    const NSZ: Self = Self(4);
-    const AllowRecip: Self = Self(8);
-    const Fast: Self = Self(16);
-    const AllowContractFastINTEL: Self = Self(65536);
-    const AllowReassocINTEL: Self = Self(131072);
+    pub const None: Self = Self(0);
+    pub const NotNaN: Self = Self(1);
+    pub const NotInf: Self = Self(2);
+    pub const NSZ: Self = Self(4);
+    pub const AllowRecip: Self = Self(8);
+    pub const Fast: Self = Self(16);
+    pub const AllowContractFastINTEL: Self = Self(65536);
+    pub const AllowReassocINTEL: Self = Self(131072);
 }
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct SelectionControl(pub u32);
 impl SelectionControl {
-    const None: Self = Self(0);
-    const Flatten: Self = Self(1);
-    const DontFlatten: Self = Self(2);
+    pub const None: Self = Self(0);
+    pub const Flatten: Self = Self(1);
+    pub const DontFlatten: Self = Self(2);
 }
 pub type LoopControl = BitEnum<LoopControlBits>;
 #[repr(u32)]
@@ -813,31 +813,31 @@ pub enum LoopControlBits {
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct FunctionControl(pub u32);
 impl FunctionControl {
-    const None: Self = Self(0);
-    const Inline: Self = Self(1);
-    const DontInline: Self = Self(2);
-    const Pure: Self = Self(4);
-    const Const: Self = Self(8);
-    const OptNoneINTEL: Self = Self(65536);
+    pub const None: Self = Self(0);
+    pub const Inline: Self = Self(1);
+    pub const DontInline: Self = Self(2);
+    pub const Pure: Self = Self(4);
+    pub const Const: Self = Self(8);
+    pub const OptNoneINTEL: Self = Self(65536);
 }
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct MemorySemantics(pub u32);
 impl MemorySemantics {
-    const Relaxed: Self = Self(0);
-    const Acquire: Self = Self(2);
-    const Release: Self = Self(4);
-    const AcquireRelease: Self = Self(8);
-    const SequentiallyConsistent: Self = Self(16);
-    const UniformMemory: Self = Self(64);
-    const SubgroupMemory: Self = Self(128);
-    const WorkgroupMemory: Self = Self(256);
-    const CrossWorkgroupMemory: Self = Self(512);
-    const AtomicCounterMemory: Self = Self(1024);
-    const ImageMemory: Self = Self(2048);
-    const OutputMemory: Self = Self(4096);
-    const MakeAvailable: Self = Self(8192);
-    const MakeVisible: Self = Self(16384);
-    const Volatile: Self = Self(32768);
+    pub const Relaxed: Self = Self(0);
+    pub const Acquire: Self = Self(2);
+    pub const Release: Self = Self(4);
+    pub const AcquireRelease: Self = Self(8);
+    pub const SequentiallyConsistent: Self = Self(16);
+    pub const UniformMemory: Self = Self(64);
+    pub const SubgroupMemory: Self = Self(128);
+    pub const WorkgroupMemory: Self = Self(256);
+    pub const CrossWorkgroupMemory: Self = Self(512);
+    pub const AtomicCounterMemory: Self = Self(1024);
+    pub const ImageMemory: Self = Self(2048);
+    pub const OutputMemory: Self = Self(4096);
+    pub const MakeAvailable: Self = Self(8192);
+    pub const MakeVisible: Self = Self(16384);
+    pub const Volatile: Self = Self(32768);
 }
 pub type MemoryAccess = BitEnum<MemoryAccessBits>;
 #[repr(u32)]
@@ -857,31 +857,31 @@ pub enum MemoryAccessBits {
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct KernelProfilingInfo(pub u32);
 impl KernelProfilingInfo {
-    const None: Self = Self(0);
-    const CmdExecTime: Self = Self(1);
+    pub const None: Self = Self(0);
+    pub const CmdExecTime: Self = Self(1);
 }
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct RayFlags(pub u32);
 impl RayFlags {
-    const NoneKHR: Self = Self(0);
-    const OpaqueKHR: Self = Self(1);
-    const NoOpaqueKHR: Self = Self(2);
-    const TerminateOnFirstHitKHR: Self = Self(4);
-    const SkipClosestHitShaderKHR: Self = Self(8);
-    const CullBackFacingTrianglesKHR: Self = Self(16);
-    const CullFrontFacingTrianglesKHR: Self = Self(32);
-    const CullOpaqueKHR: Self = Self(64);
-    const CullNoOpaqueKHR: Self = Self(128);
-    const SkipTrianglesKHR: Self = Self(256);
-    const SkipAABBsKHR: Self = Self(512);
+    pub const NoneKHR: Self = Self(0);
+    pub const OpaqueKHR: Self = Self(1);
+    pub const NoOpaqueKHR: Self = Self(2);
+    pub const TerminateOnFirstHitKHR: Self = Self(4);
+    pub const SkipClosestHitShaderKHR: Self = Self(8);
+    pub const CullBackFacingTrianglesKHR: Self = Self(16);
+    pub const CullFrontFacingTrianglesKHR: Self = Self(32);
+    pub const CullOpaqueKHR: Self = Self(64);
+    pub const CullNoOpaqueKHR: Self = Self(128);
+    pub const SkipTrianglesKHR: Self = Self(256);
+    pub const SkipAABBsKHR: Self = Self(512);
 }
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct FragmentShadingRate(pub u32);
 impl FragmentShadingRate {
-    const Vertical2Pixels: Self = Self(1);
-    const Vertical4Pixels: Self = Self(2);
-    const Horizontal2Pixels: Self = Self(4);
-    const Horizontal4Pixels: Self = Self(8);
+    pub const Vertical2Pixels: Self = Self(1);
+    pub const Vertical4Pixels: Self = Self(2);
+    pub const Horizontal2Pixels: Self = Self(4);
+    pub const Horizontal4Pixels: Self = Self(8);
 }
 #[repr(u32)]
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
