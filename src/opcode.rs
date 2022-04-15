@@ -744,26 +744,145 @@ pub enum Opcode {
     OpGroupLogicalOrKHR(IdType, IdResult, ID, GroupOperation, ID) = 6407,
     OpGroupLogicalXorKHR(IdType, IdResult, ID, GroupOperation, ID) = 6408,
 }
+pub type ImageOperands = BitEnum<ImageOperandsBits>;
+#[repr(u32)]
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub struct ImageOperands(pub u32);
+pub enum ImageOperandsBits {
+    #[default]
+    None = 0,
+    Bias(ID) = 1,
+    Lod(ID) = 2,
+    Grad(ID, ID) = 4,
+    ConstOffset(ID) = 8,
+    Offset(ID) = 16,
+    ConstOffsets(ID) = 32,
+    Sample(ID) = 64,
+    MinLod(ID) = 128,
+    MakeTexelAvailable(ID) = 256,
+    MakeTexelVisible(ID) = 512,
+    NonPrivateTexel = 1024,
+    VolatileTexel = 2048,
+    SignExtend = 4096,
+    ZeroExtend = 8192,
+    Nontemporal = 16384,
+    Offsets(ID) = 65536,
+}
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct FPFastMathMode(pub u32);
+impl FPFastMathMode {
+    const None: Self = Self(0);
+    const NotNaN: Self = Self(1);
+    const NotInf: Self = Self(2);
+    const NSZ: Self = Self(4);
+    const AllowRecip: Self = Self(8);
+    const Fast: Self = Self(16);
+    const AllowContractFastINTEL: Self = Self(65536);
+    const AllowReassocINTEL: Self = Self(131072);
+}
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct SelectionControl(pub u32);
+impl SelectionControl {
+    const None: Self = Self(0);
+    const Flatten: Self = Self(1);
+    const DontFlatten: Self = Self(2);
+}
+pub type LoopControl = BitEnum<LoopControlBits>;
+#[repr(u32)]
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub struct LoopControl(pub u32);
+pub enum LoopControlBits {
+    #[default]
+    None = 0,
+    Unroll = 1,
+    DontUnroll = 2,
+    DependencyInfinite = 4,
+    DependencyLength(u32) = 8,
+    MinIterations(u32) = 16,
+    MaxIterations(u32) = 32,
+    IterationMultiple(u32) = 64,
+    PeelCount(u32) = 128,
+    PartialCount(u32) = 256,
+    InitiationIntervalINTEL(u32) = 65536,
+    MaxConcurrencyINTEL(u32) = 131072,
+    DependencyArrayINTEL(u32) = 262144,
+    PipelineEnableINTEL(u32) = 524288,
+    LoopCoalesceINTEL(u32) = 1048576,
+    MaxInterleavingINTEL(u32) = 2097152,
+    SpeculatedIterationsINTEL(u32) = 4194304,
+    NoFusionINTEL(u32) = 8388608,
+}
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct FunctionControl(pub u32);
+impl FunctionControl {
+    const None: Self = Self(0);
+    const Inline: Self = Self(1);
+    const DontInline: Self = Self(2);
+    const Pure: Self = Self(4);
+    const Const: Self = Self(8);
+    const OptNoneINTEL: Self = Self(65536);
+}
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct MemorySemantics(pub u32);
+impl MemorySemantics {
+    const Relaxed: Self = Self(0);
+    const Acquire: Self = Self(2);
+    const Release: Self = Self(4);
+    const AcquireRelease: Self = Self(8);
+    const SequentiallyConsistent: Self = Self(16);
+    const UniformMemory: Self = Self(64);
+    const SubgroupMemory: Self = Self(128);
+    const WorkgroupMemory: Self = Self(256);
+    const CrossWorkgroupMemory: Self = Self(512);
+    const AtomicCounterMemory: Self = Self(1024);
+    const ImageMemory: Self = Self(2048);
+    const OutputMemory: Self = Self(4096);
+    const MakeAvailable: Self = Self(8192);
+    const MakeVisible: Self = Self(16384);
+    const Volatile: Self = Self(32768);
+}
+pub type MemoryAccess = BitEnum<MemoryAccessBits>;
+#[repr(u32)]
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
-pub struct MemoryAccess(pub u32);
+pub enum MemoryAccessBits {
+    #[default]
+    None = 0,
+    Volatile = 1,
+    Aligned(u32) = 2,
+    Nontemporal = 4,
+    MakePointerAvailable(ID) = 8,
+    MakePointerVisible(ID) = 16,
+    NonPrivatePointer = 32,
+    AliasScopeINTELMask(ID) = 65536,
+    NoAliasINTELMask(ID) = 131072,
+}
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct KernelProfilingInfo(pub u32);
+impl KernelProfilingInfo {
+    const None: Self = Self(0);
+    const CmdExecTime: Self = Self(1);
+}
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct RayFlags(pub u32);
+impl RayFlags {
+    const NoneKHR: Self = Self(0);
+    const OpaqueKHR: Self = Self(1);
+    const NoOpaqueKHR: Self = Self(2);
+    const TerminateOnFirstHitKHR: Self = Self(4);
+    const SkipClosestHitShaderKHR: Self = Self(8);
+    const CullBackFacingTrianglesKHR: Self = Self(16);
+    const CullFrontFacingTrianglesKHR: Self = Self(32);
+    const CullOpaqueKHR: Self = Self(64);
+    const CullNoOpaqueKHR: Self = Self(128);
+    const SkipTrianglesKHR: Self = Self(256);
+    const SkipAABBsKHR: Self = Self(512);
+}
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub struct FragmentShadingRate(pub u32);
+impl FragmentShadingRate {
+    const Vertical2Pixels: Self = Self(1);
+    const Vertical4Pixels: Self = Self(2);
+    const Horizontal2Pixels: Self = Self(4);
+    const Horizontal4Pixels: Self = Self(8);
+}
 #[repr(u32)]
 #[derive(Default, Debug, Clone, Hash, Eq, PartialEq, Copy)]
 pub enum SourceLanguage {
@@ -1623,6 +1742,35 @@ pub enum PackedVectorFormat {
 pub struct ID(pub u32);
 pub type IdResult = ID;
 pub type IdType = ID;
+#[derive(Default, Debug, Clone, Hash, Eq, PartialEq)]
+pub struct BitEnum<T: BitField> {
+    fields: Vec<T>,
+}
+impl<T: BitField> Asm for BitEnum<T> {
+    fn write_word(&self, sink: &mut Vec<u32>) {
+        let opc_idx = sink.len();
+        sink.push(0);
+        let mut fields = self.fields.iter().collect::<Vec<&T>>();
+        fields.sort_by(|a, b| a.opcode().cmp(&b.opcode()));
+        for field in &self.fields {
+            field.write_word(opc_idx, sink);
+        }
+    }
+    fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
+        let mut opc = chunk[*idx];
+        *idx += 1;
+        let mut fields = vec![];
+        while opc != 0 {
+            fields.push(T::read_word(chunk, &mut opc, idx))
+        }
+        Self { fields }
+    }
+}
+pub trait BitField {
+    fn opcode(&self) -> u32;
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>);
+    fn read_word(chunk: &[u32], opc: &mut u32, idx: &mut usize) -> Self;
+}
 pub trait Asm {
     fn write_word(&self, sink: &mut Vec<u32>);
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self;
@@ -13416,61 +13564,121 @@ impl Asm for Opcode {
         re
     }
 }
-impl ImageOperands {
-    pub fn opcode(&self) -> u32 {
+impl BitField for ImageOperandsBits {
+    fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const None: Self = Self(0);
-    const Bias: Self = Self(1);
-    const Lod: Self = Self(2);
-    const Grad: Self = Self(4);
-    const ConstOffset: Self = Self(8);
-    const Offset: Self = Self(16);
-    const ConstOffsets: Self = Self(32);
-    const Sample: Self = Self(64);
-    const MinLod: Self = Self(128);
-    const MakeTexelAvailable: Self = Self(256);
-    const MakeTexelVisible: Self = Self(512);
-    const NonPrivateTexel: Self = Self(1024);
-    const VolatileTexel: Self = Self(2048);
-    const SignExtend: Self = Self(4096);
-    const ZeroExtend: Self = Self(8192);
-    const Nontemporal: Self = Self(16384);
-    const Offsets: Self = Self(65536);
-}
-impl std::ops::BitOr<ImageOperands> for ImageOperands {
-    type Output = Self;
-    fn bitor(self, rhs: Self) -> Self {
-        Self(self.0 | rhs.0)
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>) {
+        use ImageOperandsBits::*;
+        sink[opc_idx] |= self.opcode();
+        match self {
+            None => (),
+            Bias(x0) => {
+                x0.write_word(sink);
+            }
+            Lod(x0) => {
+                x0.write_word(sink);
+            }
+            Grad(x0, x1) => {
+                x0.write_word(sink);
+                x1.write_word(sink);
+            }
+            ConstOffset(x0) => {
+                x0.write_word(sink);
+            }
+            Offset(x0) => {
+                x0.write_word(sink);
+            }
+            ConstOffsets(x0) => {
+                x0.write_word(sink);
+            }
+            Sample(x0) => {
+                x0.write_word(sink);
+            }
+            MinLod(x0) => {
+                x0.write_word(sink);
+            }
+            MakeTexelAvailable(x0) => {
+                x0.write_word(sink);
+            }
+            MakeTexelVisible(x0) => {
+                x0.write_word(sink);
+            }
+            NonPrivateTexel => (),
+            VolatileTexel => (),
+            SignExtend => (),
+            ZeroExtend => (),
+            Nontemporal => (),
+            Offsets(x0) => {
+                x0.write_word(sink);
+            }
+            what => panic!("{:?}", what),
+        }
     }
-}
-impl std::ops::BitAnd<ImageOperands> for ImageOperands {
-    type Output = Self;
-    fn bitand(self, rhs: Self) -> Self {
-        Self(self.0 & rhs.0)
-    }
-}
-impl Asm for ImageOperands {
-    fn write_word(&self, sink: &mut Vec<u32>) {
-        sink.push(self.opcode());
-    }
-    fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        *idx += 1;
-        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
+    fn read_word(chunk: &[u32], opc: &mut u32, idx: &mut usize) -> Self {
+        use ImageOperandsBits::*;
+        let this = 1 << opc.trailing_zeros();
+        *opc &= !this;
+        match this {
+            0 => None,
+            1 => {
+                let x0 = Asm::read_word(chunk, idx);
+                Bias(x0)
+            }
+            2 => {
+                let x0 = Asm::read_word(chunk, idx);
+                Lod(x0)
+            }
+            4 => {
+                let x0 = Asm::read_word(chunk, idx);
+                let x1 = Asm::read_word(chunk, idx);
+                Grad(x0, x1)
+            }
+            8 => {
+                let x0 = Asm::read_word(chunk, idx);
+                ConstOffset(x0)
+            }
+            16 => {
+                let x0 = Asm::read_word(chunk, idx);
+                Offset(x0)
+            }
+            32 => {
+                let x0 = Asm::read_word(chunk, idx);
+                ConstOffsets(x0)
+            }
+            64 => {
+                let x0 = Asm::read_word(chunk, idx);
+                Sample(x0)
+            }
+            128 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MinLod(x0)
+            }
+            256 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MakeTexelAvailable(x0)
+            }
+            512 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MakeTexelVisible(x0)
+            }
+            1024 => NonPrivateTexel,
+            2048 => VolatileTexel,
+            4096 => SignExtend,
+            8192 => ZeroExtend,
+            16384 => Nontemporal,
+            65536 => {
+                let x0 = Asm::read_word(chunk, idx);
+                Offsets(x0)
+            }
+            what => panic!("{:?}", what),
+        }
     }
 }
 impl FPFastMathMode {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const None: Self = Self(0);
-    const NotNaN: Self = Self(1);
-    const NotInf: Self = Self(2);
-    const NSZ: Self = Self(4);
-    const AllowRecip: Self = Self(8);
-    const Fast: Self = Self(16);
-    const AllowContractFastINTEL: Self = Self(65536);
-    const AllowReassocINTEL: Self = Self(131072);
 }
 impl std::ops::BitOr<FPFastMathMode> for FPFastMathMode {
     type Output = Self;
@@ -13497,9 +13705,6 @@ impl SelectionControl {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const None: Self = Self(0);
-    const Flatten: Self = Self(1);
-    const DontFlatten: Self = Self(2);
 }
 impl std::ops::BitOr<SelectionControl> for SelectionControl {
     type Output = Self;
@@ -13522,60 +13727,136 @@ impl Asm for SelectionControl {
         unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
-impl LoopControl {
-    pub fn opcode(&self) -> u32 {
+impl BitField for LoopControlBits {
+    fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const None: Self = Self(0);
-    const Unroll: Self = Self(1);
-    const DontUnroll: Self = Self(2);
-    const DependencyInfinite: Self = Self(4);
-    const DependencyLength: Self = Self(8);
-    const MinIterations: Self = Self(16);
-    const MaxIterations: Self = Self(32);
-    const IterationMultiple: Self = Self(64);
-    const PeelCount: Self = Self(128);
-    const PartialCount: Self = Self(256);
-    const InitiationIntervalINTEL: Self = Self(65536);
-    const MaxConcurrencyINTEL: Self = Self(131072);
-    const DependencyArrayINTEL: Self = Self(262144);
-    const PipelineEnableINTEL: Self = Self(524288);
-    const LoopCoalesceINTEL: Self = Self(1048576);
-    const MaxInterleavingINTEL: Self = Self(2097152);
-    const SpeculatedIterationsINTEL: Self = Self(4194304);
-    const NoFusionINTEL: Self = Self(8388608);
-}
-impl std::ops::BitOr<LoopControl> for LoopControl {
-    type Output = Self;
-    fn bitor(self, rhs: Self) -> Self {
-        Self(self.0 | rhs.0)
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>) {
+        use LoopControlBits::*;
+        sink[opc_idx] |= self.opcode();
+        match self {
+            None => (),
+            Unroll => (),
+            DontUnroll => (),
+            DependencyInfinite => (),
+            DependencyLength(x0) => {
+                x0.write_word(sink);
+            }
+            MinIterations(x0) => {
+                x0.write_word(sink);
+            }
+            MaxIterations(x0) => {
+                x0.write_word(sink);
+            }
+            IterationMultiple(x0) => {
+                x0.write_word(sink);
+            }
+            PeelCount(x0) => {
+                x0.write_word(sink);
+            }
+            PartialCount(x0) => {
+                x0.write_word(sink);
+            }
+            InitiationIntervalINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            MaxConcurrencyINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            DependencyArrayINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            PipelineEnableINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            LoopCoalesceINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            MaxInterleavingINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            SpeculatedIterationsINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            NoFusionINTEL(x0) => {
+                x0.write_word(sink);
+            }
+            what => panic!("{:?}", what),
+        }
     }
-}
-impl std::ops::BitAnd<LoopControl> for LoopControl {
-    type Output = Self;
-    fn bitand(self, rhs: Self) -> Self {
-        Self(self.0 & rhs.0)
-    }
-}
-impl Asm for LoopControl {
-    fn write_word(&self, sink: &mut Vec<u32>) {
-        sink.push(self.opcode());
-    }
-    fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        *idx += 1;
-        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
+    fn read_word(chunk: &[u32], opc: &mut u32, idx: &mut usize) -> Self {
+        use LoopControlBits::*;
+        let this = 1 << opc.trailing_zeros();
+        *opc &= !this;
+        match this {
+            0 => None,
+            1 => Unroll,
+            2 => DontUnroll,
+            4 => DependencyInfinite,
+            8 => {
+                let x0 = Asm::read_word(chunk, idx);
+                DependencyLength(x0)
+            }
+            16 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MinIterations(x0)
+            }
+            32 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MaxIterations(x0)
+            }
+            64 => {
+                let x0 = Asm::read_word(chunk, idx);
+                IterationMultiple(x0)
+            }
+            128 => {
+                let x0 = Asm::read_word(chunk, idx);
+                PeelCount(x0)
+            }
+            256 => {
+                let x0 = Asm::read_word(chunk, idx);
+                PartialCount(x0)
+            }
+            65536 => {
+                let x0 = Asm::read_word(chunk, idx);
+                InitiationIntervalINTEL(x0)
+            }
+            131072 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MaxConcurrencyINTEL(x0)
+            }
+            262144 => {
+                let x0 = Asm::read_word(chunk, idx);
+                DependencyArrayINTEL(x0)
+            }
+            524288 => {
+                let x0 = Asm::read_word(chunk, idx);
+                PipelineEnableINTEL(x0)
+            }
+            1048576 => {
+                let x0 = Asm::read_word(chunk, idx);
+                LoopCoalesceINTEL(x0)
+            }
+            2097152 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MaxInterleavingINTEL(x0)
+            }
+            4194304 => {
+                let x0 = Asm::read_word(chunk, idx);
+                SpeculatedIterationsINTEL(x0)
+            }
+            8388608 => {
+                let x0 = Asm::read_word(chunk, idx);
+                NoFusionINTEL(x0)
+            }
+            what => panic!("{:?}", what),
+        }
     }
 }
 impl FunctionControl {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const None: Self = Self(0);
-    const Inline: Self = Self(1);
-    const DontInline: Self = Self(2);
-    const Pure: Self = Self(4);
-    const Const: Self = Self(8);
-    const OptNoneINTEL: Self = Self(65536);
 }
 impl std::ops::BitOr<FunctionControl> for FunctionControl {
     type Output = Self;
@@ -13602,21 +13883,6 @@ impl MemorySemantics {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const Relaxed: Self = Self(0);
-    const Acquire: Self = Self(2);
-    const Release: Self = Self(4);
-    const AcquireRelease: Self = Self(8);
-    const SequentiallyConsistent: Self = Self(16);
-    const UniformMemory: Self = Self(64);
-    const SubgroupMemory: Self = Self(128);
-    const WorkgroupMemory: Self = Self(256);
-    const CrossWorkgroupMemory: Self = Self(512);
-    const AtomicCounterMemory: Self = Self(1024);
-    const ImageMemory: Self = Self(2048);
-    const OutputMemory: Self = Self(4096);
-    const MakeAvailable: Self = Self(8192);
-    const MakeVisible: Self = Self(16384);
-    const Volatile: Self = Self(32768);
 }
 impl std::ops::BitOr<MemorySemantics> for MemorySemantics {
     type Output = Self;
@@ -13639,47 +13905,73 @@ impl Asm for MemorySemantics {
         unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
     }
 }
-impl MemoryAccess {
-    pub fn opcode(&self) -> u32 {
+impl BitField for MemoryAccessBits {
+    fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const None: Self = Self(0);
-    const Volatile: Self = Self(1);
-    const Aligned: Self = Self(2);
-    const Nontemporal: Self = Self(4);
-    const MakePointerAvailable: Self = Self(8);
-    const MakePointerVisible: Self = Self(16);
-    const NonPrivatePointer: Self = Self(32);
-    const AliasScopeINTELMask: Self = Self(65536);
-    const NoAliasINTELMask: Self = Self(131072);
-}
-impl std::ops::BitOr<MemoryAccess> for MemoryAccess {
-    type Output = Self;
-    fn bitor(self, rhs: Self) -> Self {
-        Self(self.0 | rhs.0)
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>) {
+        use MemoryAccessBits::*;
+        sink[opc_idx] |= self.opcode();
+        match self {
+            None => (),
+            Volatile => (),
+            Aligned(x0) => {
+                x0.write_word(sink);
+            }
+            Nontemporal => (),
+            MakePointerAvailable(x0) => {
+                x0.write_word(sink);
+            }
+            MakePointerVisible(x0) => {
+                x0.write_word(sink);
+            }
+            NonPrivatePointer => (),
+            AliasScopeINTELMask(x0) => {
+                x0.write_word(sink);
+            }
+            NoAliasINTELMask(x0) => {
+                x0.write_word(sink);
+            }
+            what => panic!("{:?}", what),
+        }
     }
-}
-impl std::ops::BitAnd<MemoryAccess> for MemoryAccess {
-    type Output = Self;
-    fn bitand(self, rhs: Self) -> Self {
-        Self(self.0 & rhs.0)
-    }
-}
-impl Asm for MemoryAccess {
-    fn write_word(&self, sink: &mut Vec<u32>) {
-        sink.push(self.opcode());
-    }
-    fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
-        *idx += 1;
-        unsafe { std::mem::transmute_copy(&chunk[*idx as usize - 1]) }
+    fn read_word(chunk: &[u32], opc: &mut u32, idx: &mut usize) -> Self {
+        use MemoryAccessBits::*;
+        let this = 1 << opc.trailing_zeros();
+        *opc &= !this;
+        match this {
+            0 => None,
+            1 => Volatile,
+            2 => {
+                let x0 = Asm::read_word(chunk, idx);
+                Aligned(x0)
+            }
+            4 => Nontemporal,
+            8 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MakePointerAvailable(x0)
+            }
+            16 => {
+                let x0 = Asm::read_word(chunk, idx);
+                MakePointerVisible(x0)
+            }
+            32 => NonPrivatePointer,
+            65536 => {
+                let x0 = Asm::read_word(chunk, idx);
+                AliasScopeINTELMask(x0)
+            }
+            131072 => {
+                let x0 = Asm::read_word(chunk, idx);
+                NoAliasINTELMask(x0)
+            }
+            what => panic!("{:?}", what),
+        }
     }
 }
 impl KernelProfilingInfo {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const None: Self = Self(0);
-    const CmdExecTime: Self = Self(1);
 }
 impl std::ops::BitOr<KernelProfilingInfo> for KernelProfilingInfo {
     type Output = Self;
@@ -13706,17 +13998,6 @@ impl RayFlags {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const NoneKHR: Self = Self(0);
-    const OpaqueKHR: Self = Self(1);
-    const NoOpaqueKHR: Self = Self(2);
-    const TerminateOnFirstHitKHR: Self = Self(4);
-    const SkipClosestHitShaderKHR: Self = Self(8);
-    const CullBackFacingTrianglesKHR: Self = Self(16);
-    const CullFrontFacingTrianglesKHR: Self = Self(32);
-    const CullOpaqueKHR: Self = Self(64);
-    const CullNoOpaqueKHR: Self = Self(128);
-    const SkipTrianglesKHR: Self = Self(256);
-    const SkipAABBsKHR: Self = Self(512);
 }
 impl std::ops::BitOr<RayFlags> for RayFlags {
     type Output = Self;
@@ -13743,10 +14024,6 @@ impl FragmentShadingRate {
     pub fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    const Vertical2Pixels: Self = Self(1);
-    const Vertical4Pixels: Self = Self(2);
-    const Horizontal2Pixels: Self = Self(4);
-    const Horizontal4Pixels: Self = Self(8);
 }
 impl std::ops::BitOr<FragmentShadingRate> for FragmentShadingRate {
     type Output = Self;
@@ -13779,6 +14056,14 @@ impl Asm for SourceLanguage {
         sink.push(self.opcode());
         use SourceLanguage::*;
         match self {
+            Unknown => (),
+            ESSL => (),
+            GLSL => (),
+            OpenCL_C => (),
+            OpenCL_CPP => (),
+            HLSL => (),
+            CPP_for_OpenCL => (),
+            SYCL => (),
             what => panic!("{:?}", what),
         }
     }
@@ -13808,6 +14093,21 @@ impl Asm for ExecutionModel {
         sink.push(self.opcode());
         use ExecutionModel::*;
         match self {
+            Vertex => (),
+            TessellationControl => (),
+            TessellationEvaluation => (),
+            Geometry => (),
+            Fragment => (),
+            GLCompute => (),
+            Kernel => (),
+            TaskNV => (),
+            MeshNV => (),
+            RayGenerationNV => (),
+            IntersectionNV => (),
+            AnyHitNV => (),
+            ClosestHitNV => (),
+            MissNV => (),
+            CallableNV => (),
             what => panic!("{:?}", what),
         }
     }
@@ -13844,6 +14144,10 @@ impl Asm for AddressingModel {
         sink.push(self.opcode());
         use AddressingModel::*;
         match self {
+            Logical => (),
+            Physical32 => (),
+            Physical64 => (),
+            PhysicalStorageBuffer64 => (),
             what => panic!("{:?}", what),
         }
     }
@@ -13869,6 +14173,10 @@ impl Asm for MemoryModel {
         sink.push(self.opcode());
         use MemoryModel::*;
         match self {
+            Simple => (),
+            GLSL450 => (),
+            OpenCL => (),
+            Vulkan => (),
             what => panic!("{:?}", what),
         }
     }
@@ -13897,6 +14205,21 @@ impl Asm for ExecutionMode {
             Invocations(x0) => {
                 x0.write_word(sink);
             }
+            SpacingEqual => (),
+            SpacingFractionalEven => (),
+            SpacingFractionalOdd => (),
+            VertexOrderCw => (),
+            VertexOrderCcw => (),
+            PixelCenterInteger => (),
+            OriginUpperLeft => (),
+            OriginLowerLeft => (),
+            EarlyFragmentTests => (),
+            PointMode => (),
+            Xfb => (),
+            DepthReplacing => (),
+            DepthGreater => (),
+            DepthLess => (),
+            DepthUnchanged => (),
             LocalSize(x0, x1, x2) => {
                 x0.write_word(sink);
                 x1.write_word(sink);
@@ -13907,12 +14230,25 @@ impl Asm for ExecutionMode {
                 x1.write_word(sink);
                 x2.write_word(sink);
             }
+            InputPoints => (),
+            InputLines => (),
+            InputLinesAdjacency => (),
+            Triangles => (),
+            InputTrianglesAdjacency => (),
+            Quads => (),
+            Isolines => (),
             OutputVertices(x0) => {
                 x0.write_word(sink);
             }
+            OutputPoints => (),
+            OutputLineStrip => (),
+            OutputTriangleStrip => (),
             VecTypeHint(x0) => {
                 x0.write_word(sink);
             }
+            ContractionOff => (),
+            Initializer => (),
+            Finalizer => (),
             SubgroupSize(x0) => {
                 x0.write_word(sink);
             }
@@ -13932,6 +14268,8 @@ impl Asm for ExecutionMode {
                 x1.write_word(sink);
                 x2.write_word(sink);
             }
+            SubgroupUniformControlFlowKHR => (),
+            PostDepthCoverage => (),
             DenormPreserve(x0) => {
                 x0.write_word(sink);
             }
@@ -13947,9 +14285,20 @@ impl Asm for ExecutionMode {
             RoundingModeRTZ(x0) => {
                 x0.write_word(sink);
             }
+            StencilRefReplacingEXT => (),
+            OutputLinesNV => (),
             OutputPrimitivesNV(x0) => {
                 x0.write_word(sink);
             }
+            DerivativeGroupQuadsNV => (),
+            DerivativeGroupLinearNV => (),
+            OutputTrianglesNV => (),
+            PixelInterlockOrderedEXT => (),
+            PixelInterlockUnorderedEXT => (),
+            SampleInterlockOrderedEXT => (),
+            SampleInterlockUnorderedEXT => (),
+            ShadingRateInterlockOrderedEXT => (),
+            ShadingRateInterlockUnorderedEXT => (),
             SharedLocalMemorySizeINTEL(x0) => {
                 x0.write_word(sink);
             }
@@ -13973,6 +14322,7 @@ impl Asm for ExecutionMode {
             MaxWorkDimINTEL(x0) => {
                 x0.write_word(sink);
             }
+            NoGlobalOffsetINTEL => (),
             NumSIMDWorkitemsINTEL(x0) => {
                 x0.write_word(sink);
             }
@@ -14159,6 +14509,29 @@ impl Asm for StorageClass {
         sink.push(self.opcode());
         use StorageClass::*;
         match self {
+            UniformConstant => (),
+            Input => (),
+            Uniform => (),
+            Output => (),
+            Workgroup => (),
+            CrossWorkgroup => (),
+            Private => (),
+            Function => (),
+            Generic => (),
+            PushConstant => (),
+            AtomicCounter => (),
+            Image => (),
+            StorageBuffer => (),
+            CallableDataNV => (),
+            IncomingCallableDataNV => (),
+            RayPayloadNV => (),
+            HitAttributeNV => (),
+            IncomingRayPayloadNV => (),
+            ShaderRecordBufferNV => (),
+            PhysicalStorageBuffer => (),
+            CodeSectionINTEL => (),
+            DeviceOnlyINTEL => (),
+            HostOnlyINTEL => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14203,6 +14576,13 @@ impl Asm for Dim {
         sink.push(self.opcode());
         use Dim::*;
         match self {
+            _1D => (),
+            _2D => (),
+            _3D => (),
+            Cube => (),
+            Rect => (),
+            Buffer => (),
+            SubpassData => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14231,6 +14611,11 @@ impl Asm for SamplerAddressingMode {
         sink.push(self.opcode());
         use SamplerAddressingMode::*;
         match self {
+            None => (),
+            ClampToEdge => (),
+            Clamp => (),
+            Repeat => (),
+            RepeatMirrored => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14257,6 +14642,8 @@ impl Asm for SamplerFilterMode {
         sink.push(self.opcode());
         use SamplerFilterMode::*;
         match self {
+            Nearest => (),
+            Linear => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14280,6 +14667,48 @@ impl Asm for ImageFormat {
         sink.push(self.opcode());
         use ImageFormat::*;
         match self {
+            Unknown => (),
+            Rgba32f => (),
+            Rgba16f => (),
+            R32f => (),
+            Rgba8 => (),
+            Rgba8Snorm => (),
+            Rg32f => (),
+            Rg16f => (),
+            R11fG11fB10f => (),
+            R16f => (),
+            Rgba16 => (),
+            Rgb10A2 => (),
+            Rg16 => (),
+            Rg8 => (),
+            R16 => (),
+            R8 => (),
+            Rgba16Snorm => (),
+            Rg16Snorm => (),
+            Rg8Snorm => (),
+            R16Snorm => (),
+            R8Snorm => (),
+            Rgba32i => (),
+            Rgba16i => (),
+            Rgba8i => (),
+            R32i => (),
+            Rg32i => (),
+            Rg16i => (),
+            Rg8i => (),
+            R16i => (),
+            R8i => (),
+            Rgba32ui => (),
+            Rgba16ui => (),
+            Rgba8ui => (),
+            R32ui => (),
+            Rgb10a2ui => (),
+            Rg32ui => (),
+            Rg16ui => (),
+            Rg8ui => (),
+            R16ui => (),
+            R8ui => (),
+            R64ui => (),
+            R64i => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14343,6 +14772,26 @@ impl Asm for ImageChannelOrder {
         sink.push(self.opcode());
         use ImageChannelOrder::*;
         match self {
+            R => (),
+            A => (),
+            RG => (),
+            RA => (),
+            RGB => (),
+            RGBA => (),
+            BGRA => (),
+            ARGB => (),
+            Intensity => (),
+            Luminance => (),
+            Rx => (),
+            RGx => (),
+            RGBx => (),
+            Depth => (),
+            DepthStencil => (),
+            sRGB => (),
+            sRGBx => (),
+            sRGBA => (),
+            sBGRA => (),
+            ABGR => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14384,6 +14833,23 @@ impl Asm for ImageChannelDataType {
         sink.push(self.opcode());
         use ImageChannelDataType::*;
         match self {
+            SnormInt8 => (),
+            SnormInt16 => (),
+            UnormInt8 => (),
+            UnormInt16 => (),
+            UnormShort565 => (),
+            UnormShort555 => (),
+            UnormInt101010 => (),
+            SignedInt8 => (),
+            SignedInt16 => (),
+            SignedInt32 => (),
+            UnsignedInt8 => (),
+            UnsignedInt16 => (),
+            UnsignedInt32 => (),
+            HalfFloat => (),
+            Float => (),
+            UnormInt24 => (),
+            UnormInt101010_2 => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14422,6 +14888,10 @@ impl Asm for FPRoundingMode {
         sink.push(self.opcode());
         use FPRoundingMode::*;
         match self {
+            RTE => (),
+            RTZ => (),
+            RTP => (),
+            RTN => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14447,6 +14917,8 @@ impl Asm for FPDenormMode {
         sink.push(self.opcode());
         use FPDenormMode::*;
         match self {
+            Preserve => (),
+            FlushToZero => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14470,6 +14942,14 @@ impl Asm for QuantizationModes {
         sink.push(self.opcode());
         use QuantizationModes::*;
         match self {
+            TRN => (),
+            TRN_ZERO => (),
+            RND => (),
+            RND_ZERO => (),
+            RND_INF => (),
+            RND_MIN_INF => (),
+            RND_CONV => (),
+            RND_CONV_ODD => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14499,6 +14979,8 @@ impl Asm for FPOperationMode {
         sink.push(self.opcode());
         use FPOperationMode::*;
         match self {
+            IEEE => (),
+            ALT => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14522,6 +15004,10 @@ impl Asm for OverflowModes {
         sink.push(self.opcode());
         use OverflowModes::*;
         match self {
+            WRAP => (),
+            SAT => (),
+            SAT_ZERO => (),
+            SAT_SYM => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14547,6 +15033,9 @@ impl Asm for LinkageType {
         sink.push(self.opcode());
         use LinkageType::*;
         match self {
+            Export => (),
+            Import => (),
+            LinkOnceODR => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14571,6 +15060,9 @@ impl Asm for AccessQualifier {
         sink.push(self.opcode());
         use AccessQualifier::*;
         match self {
+            ReadOnly => (),
+            WriteOnly => (),
+            ReadWrite => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14595,6 +15087,14 @@ impl Asm for FunctionParameterAttribute {
         sink.push(self.opcode());
         use FunctionParameterAttribute::*;
         match self {
+            Zext => (),
+            Sext => (),
+            ByVal => (),
+            Sret => (),
+            NoAlias => (),
+            NoCapture => (),
+            NoWrite => (),
+            NoReadWrite => (),
             what => panic!("{:?}", what),
         }
     }
@@ -14624,21 +15124,44 @@ impl Asm for Decoration {
         sink.push(self.opcode());
         use Decoration::*;
         match self {
+            RelaxedPrecision => (),
             SpecId(x0) => {
                 x0.write_word(sink);
             }
+            Block => (),
+            BufferBlock => (),
+            RowMajor => (),
+            ColMajor => (),
             ArrayStride(x0) => {
                 x0.write_word(sink);
             }
             MatrixStride(x0) => {
                 x0.write_word(sink);
             }
+            GLSLShared => (),
+            GLSLPacked => (),
+            CPacked => (),
             BuiltIn(x0) => {
                 x0.write_word(sink);
             }
+            NoPerspective => (),
+            Flat => (),
+            Patch => (),
+            Centroid => (),
+            Sample => (),
+            Invariant => (),
+            Restrict => (),
+            Aliased => (),
+            Volatile => (),
+            Constant => (),
+            Coherent => (),
+            NonWritable => (),
+            NonReadable => (),
+            Uniform => (),
             UniformId(x0) => {
                 x0.write_word(sink);
             }
+            SaturatedConversion => (),
             Stream(x0) => {
                 x0.write_word(sink);
             }
@@ -14679,6 +15202,7 @@ impl Asm for Decoration {
                 x0.write_word(sink);
                 x1.write_word(sink);
             }
+            NoContraction => (),
             InputAttachmentIndex(x0) => {
                 x0.write_word(sink);
             }
@@ -14694,18 +15218,40 @@ impl Asm for Decoration {
             MaxByteOffsetId(x0) => {
                 x0.write_word(sink);
             }
+            NoSignedWrap => (),
+            NoUnsignedWrap => (),
+            ExplicitInterpAMD => (),
+            OverrideCoverageNV => (),
+            PassthroughNV => (),
+            ViewportRelativeNV => (),
             SecondaryViewportRelativeNV(x0) => {
                 x0.write_word(sink);
             }
+            PerPrimitiveNV => (),
+            PerViewNV => (),
+            PerTaskNV => (),
+            PerVertexKHR => (),
+            NonUniform => (),
+            RestrictPointer => (),
+            AliasedPointer => (),
+            BindlessSamplerNV => (),
+            BindlessImageNV => (),
+            BoundSamplerNV => (),
+            BoundImageNV => (),
             SIMTCallINTEL(x0) => {
                 x0.write_word(sink);
             }
+            ReferencedIndirectlyINTEL => (),
             ClobberINTEL(x0) => {
                 x0.write_word(sink);
             }
+            SideEffectsINTEL => (),
+            VectorComputeVariableINTEL => (),
             FuncParamIOKindINTEL(x0) => {
                 x0.write_word(sink);
             }
+            VectorComputeFunctionINTEL => (),
+            StackCallINTEL => (),
             GlobalVariableOffsetINTEL(x0) => {
                 x0.write_word(sink);
             }
@@ -14726,6 +15272,7 @@ impl Asm for Decoration {
                 x0.write_word(sink);
                 x1.write_word(sink);
             }
+            RegisterINTEL => (),
             MemoryINTEL(x0) => {
                 x0.write_word(sink);
             }
@@ -14738,9 +15285,12 @@ impl Asm for Decoration {
             MaxPrivateCopiesINTEL(x0) => {
                 x0.write_word(sink);
             }
+            SinglepumpINTEL => (),
+            DoublepumpINTEL => (),
             MaxReplicatesINTEL(x0) => {
                 x0.write_word(sink);
             }
+            SimpleDualPortINTEL => (),
             MergeINTEL(x0, x1) => {
                 x0.write_word(sink);
                 x1.write_word(sink);
@@ -14751,12 +15301,16 @@ impl Asm for Decoration {
             ForcePow2DepthINTEL(x0) => {
                 x0.write_word(sink);
             }
+            BurstCoalesceINTEL => (),
             CacheSizeINTEL(x0) => {
                 x0.write_word(sink);
             }
+            DontStaticallyCoalesceINTEL => (),
             PrefetchINTEL(x0) => {
                 x0.write_word(sink);
             }
+            StallEnableINTEL => (),
+            FuseLoopsInFunctionINTEL => (),
             AliasScopeINTEL(x0) => {
                 x0.write_word(sink);
             }
@@ -14773,6 +15327,9 @@ impl Asm for Decoration {
                 x0.write_word(sink);
                 x1.write_word(sink);
             }
+            SingleElementVectorINTEL => (),
+            VectorComputeCallableFunctionINTEL => (),
+            MediaBlockIOINTEL => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15048,6 +15605,105 @@ impl Asm for BuiltIn {
         sink.push(self.opcode());
         use BuiltIn::*;
         match self {
+            Position => (),
+            PointSize => (),
+            ClipDistance => (),
+            CullDistance => (),
+            VertexId => (),
+            InstanceId => (),
+            PrimitiveId => (),
+            InvocationId => (),
+            Layer => (),
+            ViewportIndex => (),
+            TessLevelOuter => (),
+            TessLevelInner => (),
+            TessCoord => (),
+            PatchVertices => (),
+            FragCoord => (),
+            PointCoord => (),
+            FrontFacing => (),
+            SampleId => (),
+            SamplePosition => (),
+            SampleMask => (),
+            FragDepth => (),
+            HelperInvocation => (),
+            NumWorkgroups => (),
+            WorkgroupSize => (),
+            WorkgroupId => (),
+            LocalInvocationId => (),
+            GlobalInvocationId => (),
+            LocalInvocationIndex => (),
+            WorkDim => (),
+            GlobalSize => (),
+            EnqueuedWorkgroupSize => (),
+            GlobalOffset => (),
+            GlobalLinearId => (),
+            SubgroupSize => (),
+            SubgroupMaxSize => (),
+            NumSubgroups => (),
+            NumEnqueuedSubgroups => (),
+            SubgroupId => (),
+            SubgroupLocalInvocationId => (),
+            VertexIndex => (),
+            InstanceIndex => (),
+            SubgroupEqMask => (),
+            SubgroupGeMask => (),
+            SubgroupGtMask => (),
+            SubgroupLeMask => (),
+            SubgroupLtMask => (),
+            BaseVertex => (),
+            BaseInstance => (),
+            DrawIndex => (),
+            PrimitiveShadingRateKHR => (),
+            DeviceIndex => (),
+            ViewIndex => (),
+            ShadingRateKHR => (),
+            BaryCoordNoPerspAMD => (),
+            BaryCoordNoPerspCentroidAMD => (),
+            BaryCoordNoPerspSampleAMD => (),
+            BaryCoordSmoothAMD => (),
+            BaryCoordSmoothCentroidAMD => (),
+            BaryCoordSmoothSampleAMD => (),
+            BaryCoordPullModelAMD => (),
+            FragStencilRefEXT => (),
+            ViewportMaskNV => (),
+            SecondaryPositionNV => (),
+            SecondaryViewportMaskNV => (),
+            PositionPerViewNV => (),
+            ViewportMaskPerViewNV => (),
+            FullyCoveredEXT => (),
+            TaskCountNV => (),
+            PrimitiveCountNV => (),
+            PrimitiveIndicesNV => (),
+            ClipDistancePerViewNV => (),
+            CullDistancePerViewNV => (),
+            LayerPerViewNV => (),
+            MeshViewCountNV => (),
+            MeshViewIndicesNV => (),
+            BaryCoordKHR => (),
+            BaryCoordNoPerspKHR => (),
+            FragSizeEXT => (),
+            FragInvocationCountEXT => (),
+            LaunchIdNV => (),
+            LaunchSizeNV => (),
+            WorldRayOriginNV => (),
+            WorldRayDirectionNV => (),
+            ObjectRayOriginNV => (),
+            ObjectRayDirectionNV => (),
+            RayTminNV => (),
+            RayTmaxNV => (),
+            InstanceCustomIndexNV => (),
+            ObjectToWorldNV => (),
+            WorldToObjectNV => (),
+            HitTNV => (),
+            HitKindNV => (),
+            CurrentRayTimeNV => (),
+            IncomingRayFlagsNV => (),
+            RayGeometryIndexKHR => (),
+            WarpsPerSMNV => (),
+            SMCountNV => (),
+            WarpIDNV => (),
+            SMIDNV => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15168,6 +15824,13 @@ impl Asm for Scope {
         sink.push(self.opcode());
         use Scope::*;
         match self {
+            CrossDevice => (),
+            Device => (),
+            Workgroup => (),
+            Subgroup => (),
+            Invocation => (),
+            QueueFamily => (),
+            ShaderCallKHR => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15196,6 +15859,13 @@ impl Asm for GroupOperation {
         sink.push(self.opcode());
         use GroupOperation::*;
         match self {
+            Reduce => (),
+            InclusiveScan => (),
+            ExclusiveScan => (),
+            ClusteredReduce => (),
+            PartitionedReduceNV => (),
+            PartitionedInclusiveScanNV => (),
+            PartitionedExclusiveScanNV => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15224,6 +15894,9 @@ impl Asm for KernelEnqueueFlags {
         sink.push(self.opcode());
         use KernelEnqueueFlags::*;
         match self {
+            NoWait => (),
+            WaitKernel => (),
+            WaitWorkGroup => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15248,6 +15921,203 @@ impl Asm for Capability {
         sink.push(self.opcode());
         use Capability::*;
         match self {
+            Matrix => (),
+            Shader => (),
+            Geometry => (),
+            Tessellation => (),
+            Addresses => (),
+            Linkage => (),
+            Kernel => (),
+            Vector16 => (),
+            Float16Buffer => (),
+            Float16 => (),
+            Float64 => (),
+            Int64 => (),
+            Int64Atomics => (),
+            ImageBasic => (),
+            ImageReadWrite => (),
+            ImageMipmap => (),
+            Pipes => (),
+            Groups => (),
+            DeviceEnqueue => (),
+            LiteralSampler => (),
+            AtomicStorage => (),
+            Int16 => (),
+            TessellationPointSize => (),
+            GeometryPointSize => (),
+            ImageGatherExtended => (),
+            StorageImageMultisample => (),
+            UniformBufferArrayDynamicIndexing => (),
+            SampledImageArrayDynamicIndexing => (),
+            StorageBufferArrayDynamicIndexing => (),
+            StorageImageArrayDynamicIndexing => (),
+            ClipDistance => (),
+            CullDistance => (),
+            ImageCubeArray => (),
+            SampleRateShading => (),
+            ImageRect => (),
+            SampledRect => (),
+            GenericPointer => (),
+            Int8 => (),
+            InputAttachment => (),
+            SparseResidency => (),
+            MinLod => (),
+            Sampled1D => (),
+            Image1D => (),
+            SampledCubeArray => (),
+            SampledBuffer => (),
+            ImageBuffer => (),
+            ImageMSArray => (),
+            StorageImageExtendedFormats => (),
+            ImageQuery => (),
+            DerivativeControl => (),
+            InterpolationFunction => (),
+            TransformFeedback => (),
+            GeometryStreams => (),
+            StorageImageReadWithoutFormat => (),
+            StorageImageWriteWithoutFormat => (),
+            MultiViewport => (),
+            SubgroupDispatch => (),
+            NamedBarrier => (),
+            PipeStorage => (),
+            GroupNonUniform => (),
+            GroupNonUniformVote => (),
+            GroupNonUniformArithmetic => (),
+            GroupNonUniformBallot => (),
+            GroupNonUniformShuffle => (),
+            GroupNonUniformShuffleRelative => (),
+            GroupNonUniformClustered => (),
+            GroupNonUniformQuad => (),
+            ShaderLayer => (),
+            ShaderViewportIndex => (),
+            UniformDecoration => (),
+            FragmentShadingRateKHR => (),
+            SubgroupBallotKHR => (),
+            DrawParameters => (),
+            WorkgroupMemoryExplicitLayoutKHR => (),
+            WorkgroupMemoryExplicitLayout8BitAccessKHR => (),
+            WorkgroupMemoryExplicitLayout16BitAccessKHR => (),
+            SubgroupVoteKHR => (),
+            StorageBuffer16BitAccess => (),
+            UniformAndStorageBuffer16BitAccess => (),
+            StoragePushConstant16 => (),
+            StorageInputOutput16 => (),
+            DeviceGroup => (),
+            MultiView => (),
+            VariablePointersStorageBuffer => (),
+            VariablePointers => (),
+            AtomicStorageOps => (),
+            SampleMaskPostDepthCoverage => (),
+            StorageBuffer8BitAccess => (),
+            UniformAndStorageBuffer8BitAccess => (),
+            StoragePushConstant8 => (),
+            DenormPreserve => (),
+            DenormFlushToZero => (),
+            SignedZeroInfNanPreserve => (),
+            RoundingModeRTE => (),
+            RoundingModeRTZ => (),
+            RayQueryProvisionalKHR => (),
+            RayQueryKHR => (),
+            RayTraversalPrimitiveCullingKHR => (),
+            RayTracingKHR => (),
+            Float16ImageAMD => (),
+            ImageGatherBiasLodAMD => (),
+            FragmentMaskAMD => (),
+            StencilExportEXT => (),
+            ImageReadWriteLodAMD => (),
+            Int64ImageEXT => (),
+            ShaderClockKHR => (),
+            SampleMaskOverrideCoverageNV => (),
+            GeometryShaderPassthroughNV => (),
+            ShaderViewportIndexLayerEXT => (),
+            ShaderViewportMaskNV => (),
+            ShaderStereoViewNV => (),
+            PerViewAttributesNV => (),
+            FragmentFullyCoveredEXT => (),
+            MeshShadingNV => (),
+            ImageFootprintNV => (),
+            FragmentBarycentricKHR => (),
+            ComputeDerivativeGroupQuadsNV => (),
+            FragmentDensityEXT => (),
+            GroupNonUniformPartitionedNV => (),
+            ShaderNonUniform => (),
+            RuntimeDescriptorArray => (),
+            InputAttachmentArrayDynamicIndexing => (),
+            UniformTexelBufferArrayDynamicIndexing => (),
+            StorageTexelBufferArrayDynamicIndexing => (),
+            UniformBufferArrayNonUniformIndexing => (),
+            SampledImageArrayNonUniformIndexing => (),
+            StorageBufferArrayNonUniformIndexing => (),
+            StorageImageArrayNonUniformIndexing => (),
+            InputAttachmentArrayNonUniformIndexing => (),
+            UniformTexelBufferArrayNonUniformIndexing => (),
+            StorageTexelBufferArrayNonUniformIndexing => (),
+            RayTracingNV => (),
+            RayTracingMotionBlurNV => (),
+            VulkanMemoryModel => (),
+            VulkanMemoryModelDeviceScope => (),
+            PhysicalStorageBufferAddresses => (),
+            ComputeDerivativeGroupLinearNV => (),
+            RayTracingProvisionalKHR => (),
+            CooperativeMatrixNV => (),
+            FragmentShaderSampleInterlockEXT => (),
+            FragmentShaderShadingRateInterlockEXT => (),
+            ShaderSMBuiltinsNV => (),
+            FragmentShaderPixelInterlockEXT => (),
+            DemoteToHelperInvocation => (),
+            BindlessTextureNV => (),
+            SubgroupShuffleINTEL => (),
+            SubgroupBufferBlockIOINTEL => (),
+            SubgroupImageBlockIOINTEL => (),
+            SubgroupImageMediaBlockIOINTEL => (),
+            RoundToInfinityINTEL => (),
+            FloatingPointModeINTEL => (),
+            IntegerFunctions2INTEL => (),
+            FunctionPointersINTEL => (),
+            IndirectReferencesINTEL => (),
+            AsmINTEL => (),
+            AtomicFloat32MinMaxEXT => (),
+            AtomicFloat64MinMaxEXT => (),
+            AtomicFloat16MinMaxEXT => (),
+            VectorComputeINTEL => (),
+            VectorAnyINTEL => (),
+            ExpectAssumeKHR => (),
+            SubgroupAvcMotionEstimationINTEL => (),
+            SubgroupAvcMotionEstimationIntraINTEL => (),
+            SubgroupAvcMotionEstimationChromaINTEL => (),
+            VariableLengthArrayINTEL => (),
+            FunctionFloatControlINTEL => (),
+            FPGAMemoryAttributesINTEL => (),
+            FPFastMathModeINTEL => (),
+            ArbitraryPrecisionIntegersINTEL => (),
+            ArbitraryPrecisionFloatingPointINTEL => (),
+            UnstructuredLoopControlsINTEL => (),
+            FPGALoopControlsINTEL => (),
+            KernelAttributesINTEL => (),
+            FPGAKernelAttributesINTEL => (),
+            FPGAMemoryAccessesINTEL => (),
+            FPGAClusterAttributesINTEL => (),
+            LoopFuseINTEL => (),
+            MemoryAccessAliasingINTEL => (),
+            FPGABufferLocationINTEL => (),
+            ArbitraryPrecisionFixedPointINTEL => (),
+            USMStorageClassesINTEL => (),
+            IOPipesINTEL => (),
+            BlockingPipesINTEL => (),
+            FPGARegINTEL => (),
+            DotProductInputAll => (),
+            DotProductInput4x8Bit => (),
+            DotProductInput4x8BitPacked => (),
+            DotProduct => (),
+            BitInstructions => (),
+            AtomicFloat32AddEXT => (),
+            AtomicFloat64AddEXT => (),
+            LongConstantCompositeINTEL => (),
+            OptNoneINTEL => (),
+            AtomicFloat16AddEXT => (),
+            DebugInfoModuleINTEL => (),
+            SplitBarrierINTEL => (),
+            GroupUniformArithmeticKHR => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15466,6 +16336,8 @@ impl Asm for RayQueryIntersection {
         sink.push(self.opcode());
         use RayQueryIntersection::*;
         match self {
+            RayQueryCandidateIntersectionKHR => (),
+            RayQueryCommittedIntersectionKHR => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15489,6 +16361,9 @@ impl Asm for RayQueryCommittedIntersectionType {
         sink.push(self.opcode());
         use RayQueryCommittedIntersectionType::*;
         match self {
+            RayQueryCommittedIntersectionNoneKHR => (),
+            RayQueryCommittedIntersectionTriangleKHR => (),
+            RayQueryCommittedIntersectionGeneratedKHR => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15513,6 +16388,8 @@ impl Asm for RayQueryCandidateIntersectionType {
         sink.push(self.opcode());
         use RayQueryCandidateIntersectionType::*;
         match self {
+            RayQueryCandidateIntersectionTriangleKHR => (),
+            RayQueryCandidateIntersectionAABBKHR => (),
             what => panic!("{:?}", what),
         }
     }
@@ -15536,6 +16413,7 @@ impl Asm for PackedVectorFormat {
         sink.push(self.opcode());
         use PackedVectorFormat::*;
         match self {
+            PackedVectorFormat4x8Bit => (),
             what => panic!("{:?}", what),
         }
     }

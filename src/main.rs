@@ -51,10 +51,8 @@ pub fn read_spirv(src_file: &str) -> Box<[u32]> {
 fn read_ops(src: &[u32]) -> Box<[Opcode]> {
     let mut idx = 0;
     let mut ops = vec![];
-    println!("Reading src: {} {}", idx, src.len());
     while idx < src.len() {
         let opc = Opcode::read_word(src, &mut idx);
-        println!("\tReading: {:?}", opc);
         ops.push(opc);
     }
     ops.into_boxed_slice()
@@ -63,7 +61,6 @@ fn read_ops(src: &[u32]) -> Box<[Opcode]> {
 fn write_ops(ops: &[Opcode]) -> Box<[u32]> {
     let mut bin = vec![];
     for op in ops {
-        //println!("Writing: {:?}", op);
         op.write_word(&mut bin);
     }
     bin.into_boxed_slice()
@@ -73,11 +70,10 @@ fn test_bin(src: &str) {
     println!("Testing {}", src);
     let mut src = read_spirv(src);
     let mut ops = read_ops(&src[5..]);
-    // let mut bin = write_ops(&ops);
-    // assert_eq!(ops, read_ops(&bin));
+    let mut bin = write_ops(&ops);
+    assert_eq!(ops, read_ops(&bin));
 }
 
 fn main() {
     visit_dirs(Path::new("bin/shaders"), test_bin);
-    // test_bin("bin/shaders/hdr/composition.spv");
 }
