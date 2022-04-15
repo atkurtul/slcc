@@ -1,5 +1,5 @@
 [package]
-name = "compiler2"
+name = "slcc"
 version = "0.1.0"
 edition = "2021"
 build = "src/build.rs"
@@ -9,7 +9,6 @@ build = "src/build.rs"
 lalrpop-util = {version = "0.19.7", features = ["lexer"] }
 clap = { version = "3.1.8", features = ["derive"] }
 fxhash = "^0"
-
 
 
 [build-dependencies]
