@@ -1,21 +1,22 @@
-use crate::expr::*;
 use crate::*;
 
-grammar;
+grammar(ctx: &mut Context<'input>);
 
 pub xLang =  {
- FunctionDef*
+ Def*
 }
 
-#[inline]
-InParamDef = {
-  <Ident> ":" <Type>,
-  "mut" <Ident> ":" <BaseType>,
-  "mut" <Ident> ":" <Pointer>,
+Def = {
+  FunctionDef,
+  TypeDef,
 }
 
-FunctionDef = {
-  <("kernel" "[" <Int> "," <Int> "," <Int> "]")?> "fn" <Ident> "(" <List<InParamDef>> ")" <("->" "(" <List<(<Ident> ":" <Type>)>> ")")?> "{"  <Statement*> "}"
+TypeDef: () = {
+  "type" <Ident> "{" <List<(<Ident> ":" <NonPtrType>)>> "}" => {ctx.init_struct(<>);}
+}
+
+FunctionDef: () = {
+  <"kernel" ?> "fn" <Ident> "(" <List<( <Ident> ":" <InputType>)>> ")" <("->" "(" <List<(<Ident> ":" <OutputType>)>> ")")?> "{" <Statement*> "}" => ctx.func_def(<>)
 }
 
 Declspec = {
@@ -66,7 +67,8 @@ Atom: Expr<'input> = {
   <Ident> => Expr::Ident(<>),
   <Literal>,
   "(" <Expr> ")",
-  <BaseType> "(" <List<Expr>> ")" => Expr::Ctor(<>),
+  <InternType<Vector>> "(" <List<Expr>> ")" => Expr::Ctor(<>),
+  <InternType<Matrix>> "(" <List<Expr>> ")" => Expr::Ctor(<>),
 }
 
 Postfix : Expr<'input> = {
@@ -95,10 +97,15 @@ Binop<Prev, Op>: Expr<'input> = {
   <P<Binop<Prev, Op>>> <Op> <P<Prev>> => Expr::Binop(<>),
 }
 
+Relop<Prev, Op>: Expr<'input> = {
+  <Prev>,
+  <P<Binop<Prev, Op>>> <Op> <P<Prev>> => Expr::Relop(<>),
+}
+
 Mulop = { "*", "/", "%"}
 Addop = { "+", "-"}
 Shlr = { "<<", ">>" }
-Relop = {  "<", "<=", ">", ">="}
+Cmpop = {  "<", "<=", ">", ">="}
 Equop = {  "==", "!=" }
 Assignop = { "=", "+=", "-=", "*=", "/=", "%=" }
 
@@ -108,8 +115,8 @@ LogOrop = { "||" }
 Mul = Binop<Unop, Mulop>;
 Add = Binop<Mul, Addop>;
 Shift = Binop<Add, Shlr>;
-Rel = Binop<Shift, Relop>;
-Equ = Binop<Rel, Equop>;
+Rel = Relop<Shift, Cmpop>;
+Equ = Relop<Rel, Equop>;
 BitAnd = Binop<Equ, "&">;
 BitXor = Binop<BitAnd, "^">;
 BitOr = Binop<BitXor, "|">;
@@ -127,48 +134,94 @@ Literal : Expr<'input> = {
 }
 
 
-Pointer: Type<'input> = {
-  "[" <P<BaseType>> "]" => Type::Ptr(<>, StorageClass::Function),
-  "[" <P<Pointer>> "]"  => Type::Ptr(<>, StorageClass::Function),
-  "[" <P<Struct>> "]"   => Type::Ptr(<>, StorageClass::Function),
+Arr: Type<'input> = {
+  "[" <Type> ":" <Int> "]" => Type::Arr(<>),
 }
 
-OpaqueType: Type<'input> = {
-  "image"   => Type::Base(BaseType::Image),
-  "image2d" => Type::Base(BaseType::Image2D),
-  "image3d" => Type::Base(BaseType::Image3D),
+Image: Type<'input> = {
+  "image1d" => Type::Image(Dim::_1D),
+  "image2d" => Type::Image(Dim::_2D),
+  "image3d" => Type::Image(Dim::_3D),
 }
 
-BaseType: Type<'input> = {
-  "int"  => Type::Base(BaseType::Int),
-  "uint" => Type::Base(BaseType::Uint),
-  "float" => Type::Base(BaseType::Float),
-  "int2" => Type::Base(BaseType:: Int2),
-  "uint2" => Type::Base(BaseType::Uint2),
-  "float2" => Type::Base(BaseType::Float2),
-  "int3" => Type::Base(BaseType:: Int3),
-  "uint3" => Type::Base(BaseType::Uint3),
-  "float3" => Type::Base(BaseType::Float3),
-  "int4" => Type::Base(BaseType:: Int4),
-  "uint4" => Type::Base(BaseType::Uint4),
-  "float4" => Type::Base(BaseType::Float4),
+Scalar: Type<'input> = {
+  "bool"  => Type::S(Bool),
+  "int"   => Type::S(Sint(32)),
+  "uint"  => Type::S(Uint(32)),
+  "float" => Type::S(Real(32)),
 }
 
-Struct : Type<'input> = Ident => Type::Struct(<>);
+Vector: Type<'input> = {
+  "bool2"  => Type::V(Bool, 2),
+  "int2"   => Type::V(Sint(32), 2),
+  "uint2"  => Type::V(Uint(32), 2),
+  "float2" => Type::V(Real(32), 2),
+  "bool3"  => Type::V(Bool, 3),
+  "int3"   => Type::V(Sint(32), 3),
+  "uint3"  => Type::V(Uint(32), 3),
+  "float3" => Type::V(Real(32), 3),
+  "bool4"  => Type::V(Bool, 4),
+  "int4"   => Type::V(Sint(32), 4),
+  "uint4"  => Type::V(Uint(32), 4),
+  "float4" => Type::V(Real(32), 4),
+}
 
-Type: Type<'input> = {
-  BaseType,
-  OpaqueType,
-  Pointer,
+Matrix: Type<'input> = { 
+  "mat2" => Type::M(Real(32), 2, 2),
+  "mat3" => Type::M(Real(32), 3, 3),
+  "mat4" => Type::M(Real(32), 4, 4),
+}
+
+Struct : InternedType<'input> = Ident => ctx.get_struct(<>);
+
+#[inline]
+InternType<T> : InternedType<'input> = T => ctx.get_type(Rc::new(<>));
+
+#[inline]
+NonPtrType: InternedType<'input> = {
+  InternType<Scalar>,
+  InternType<Vector>,
+  InternType<Matrix>,
+  InternType<Image>,
+  InternType<Arr>,
   Struct,
 }
+
+Ptr: Type<'input> = {
+  "[" <Type> "]" => Type::Ptr(<>, StorageClass::Function),
+}
+
+InputPtr: Type<'input> = {
+  "[" <Type> "]"       => Type::Ptr(<>, StorageClass::UniformConstant),
+  "mut" "[" <Type> "]" => Type::Ptr(<>, StorageClass::StorageBuffer),
+}
+
+OutputPtr: Type<'input> = {
+  "[" <Type> "]" => Type::Ptr(<>, StorageClass::StorageBuffer),
+}
+
+Type: InternedType<'input> = {
+  NonPtrType,
+  InternType<Ptr>,
+}
+
+InputType: InternedType<'input> = {
+  NonPtrType,
+  InternType<InputPtr>,
+}
+
+OutputType: InternedType<'input> = {
+  NonPtrType,
+  InternType<OutputPtr>,
+}
+
 
 match {
   r"#.*\n" => {},
   r"\s" => {},
   "const",
   "pub",
-  "kernel", "fn", "mut",  "if", "else", "while", "for",
+  "kernel", "fn", "type", "mut", "if", "else", "while", "for",
   "*" ,"/", "%", "+", "-" ,"!" ,"++","--",
   "&&", "||", "|", "&", "^", "=", "+=", "-=", "*=", "/=", "%=",
   "<<", ">>", "<", "<=", ">", ">=", "==", "!=",
@@ -176,11 +229,14 @@ match {
   "[", "]",
   "{", "}",
   "(", ")",
-  "int",  "uint",  "float",
-  "int2", "uint2", "float2",
-  "int3", "uint3", "float3",
-  "int4", "uint4", "float4",
-  "image","image2d", "image3d",
+  "mat2",
+  "mat3",
+  "mat4",
+  "bool", "int",  "uint",  "float",
+  "bool2", "int2", "uint2", "float2",
+  "bool3", "int3", "uint3", "float3",
+  "bool4", "int4", "uint4", "float4",
+  "image1d","image2d", "image3d",
   r"\d+\.\d+",
   r"\d+",
   r"[a-zA-Z]\w*" => Ident,

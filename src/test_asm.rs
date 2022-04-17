@@ -1,4 +1,4 @@
-pub use crate::opcode::*;
+pub use crate::*;
 use std::fs::{self, DirEntry};
 use std::io;
 use std::path::{Path, PathBuf};
@@ -17,10 +17,10 @@ fn visit_dirs(dir: &Path, cb: fn(&str)) {
 
 fn test_bin(src: &str) {
     println!("Testing {}", src);
-    let mut src = slcc::read_spirv(src);
-    let mut ops = slcc::read_ops(&src[5..]);
-    let mut bin = slcc::write_ops(&ops);
-    assert_eq!(ops, slcc::read_ops(&bin));
+    let mut src =   read_spirv(src);
+    let mut ops =   read_ops(&src[5..]);
+    let mut bin =   write_ops(&ops);
+    assert_eq!(ops, read_ops(&bin));
 }
 
 #[test]

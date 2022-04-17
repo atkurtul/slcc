@@ -115,6 +115,15 @@ impl Enumerant {
         format_ident!("{}{}", p, &self.enumerant)
     }
 
+    fn cap_rename(&self, val_map: &mut Map<u32, String>, rename: &mut Map<String, String>) {
+        let value = self.value();
+        if let Some(val) = val_map.get(&value) {
+            rename.insert(self.enumerant.clone(), val.clone());
+        } else {
+            val_map.insert(value, self.enumerant.clone());
+        }
+    }
+
     fn is_dupe(&self, val_set: &mut Set<u32>) -> bool {
         let value = self.value();
         if val_set.contains(&value) {
@@ -122,6 +131,14 @@ impl Enumerant {
         }
         val_set.insert(value);
         false
+    }
+
+    fn rename(&mut self, rename_map: &Map<String, String>) {
+        self.capabilities.iter_mut().for_each(|c| {
+            if let Some(rename) = rename_map.get(c) {
+                *c = rename.clone();
+            }
+        });
     }
 
     pub fn write(&self) -> TokenStream {
@@ -146,12 +163,21 @@ impl Enumerant {
         let name = self.opname();
         let args = &get_vars(self.parameters.len());
 
-        if self.parameters.is_empty() {
-            return quote! { #name => (), };
-        }
+        let lhs = if self.parameters.is_empty() {
+            quote! {}
+        } else {
+            quote! { (#(#args,)*)}
+        };
+
+        let ext = &self.extensions;
+        let cap = self.capabilities.iter().map(|e| format_ident!("{}", e));
 
         quote! {
-          #name(#(#args,)*) => {#(#args.write_word(sink);)*},
+          #name #lhs => {
+            #(req.add_cap(Capability::#cap);)*
+            #(req.add_ext(#ext.to_string());)*
+            #(#args.write_word(sink, req);)*
+          },
         }
     }
 
@@ -166,15 +192,18 @@ impl Enumerant {
     fn write_read(&self) -> TokenStream {
         let name = self.opname();
         let opc = Literal::u32_unsuffixed(self.value());
-        if self.parameters.is_empty() {
-            return quote! { #opc => #name, };
-        }
         let args = &get_vars(self.parameters.len());
+
+        let rhs = if self.parameters.is_empty() {
+            quote! {}
+        } else {
+            quote! { (#(#args,)*)}
+        };
 
         quote! {
           #opc => {
             #(let #args = Asm::read_word(chunk, idx); )*
-            #name(#(#args,)*)
+            #name #rhs
           },
         }
     }
@@ -242,7 +271,7 @@ impl Operand {
         quote! {
           impl BitField for #name {
             fn opcode(&self) -> u32 {unsafe { std::mem::transmute_copy(self) }}
-            fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>) {
+            fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               use #name::*;
               sink[opc_idx] |= self.opcode();
               match self {
@@ -289,7 +318,7 @@ impl Operand {
               }
           }
           impl Asm for #name {
-            fn write_word(&self, sink: &mut Vec<u32>) {
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               sink.push(self.opcode());
             }
 
@@ -320,7 +349,7 @@ impl Operand {
             pub fn opcode(&self) -> u32 {unsafe { std::mem::transmute_copy(self) }}
           }
           impl Asm for #name {
-            fn write_word(&self, sink: &mut Vec<u32>) {
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               sink.push(self.opcode());
               use #name::*;
               match self {
@@ -341,7 +370,7 @@ impl Operand {
         }
     }
 
-    fn init(&mut self) {
+    fn init(&mut self, rename_map: &Map<String, String>) {
         let mut val_set = Set::default();
         let mut enums = vec![];
         std::mem::swap(&mut enums, &mut self.enumerants);
@@ -349,7 +378,9 @@ impl Operand {
             .into_iter()
             .filter(|e| !e.is_dupe(&mut val_set))
             .collect();
-
+        self.enumerants
+            .iter_mut()
+            .for_each(|e| e.rename(&rename_map));
         self.is_bitfield = self.category == "BitEnum";
         self.has_parameters = self
             .enumerants
@@ -557,12 +588,12 @@ impl Instruction {
 
         if self.is_specop() {
             return quote! {
-              #opname(_,_,specop) => specop.write_word(sink),
+              #opname(_,_,specop) => specop.write_word(sink, req),
             };
         }
 
         quote! {
-          #opname(#(#args,)*) => {#(#args.write_word(sink);)*},
+          #opname(#(#args,)*) => {#(#args.write_word(sink, req);)*},
         }
     }
 
@@ -642,6 +673,7 @@ struct Grammar {
 impl Grammar {
     fn init(&mut self) {
         let mut val_set = Set::default();
+        let mut rename_map = Map::default();
         let mut instructions = vec![];
         std::mem::swap(&mut instructions, &mut self.instructions);
         self.instructions = instructions
@@ -649,7 +681,17 @@ impl Grammar {
             .filter(|e| !e.is_dupe(&mut val_set))
             .collect();
 
-        self.operands.iter_mut().for_each(Operand::init);
+        let mut val_map = Map::default();
+
+        self.operands
+            .iter()
+            .find(|e| &e.kind.0 == "Capability")
+            .unwrap()
+            .enumerants
+            .iter()
+            .for_each(|e| e.cap_rename(&mut val_map, &mut rename_map));
+
+        self.operands.iter_mut().for_each(|o| o.init(&rename_map));
 
         for op in &self.operands {
             if op.category == "BitEnum" {
@@ -700,13 +742,13 @@ impl Grammar {
           }
 
           impl<T: BitField> Asm for BitEnum<T> {
-            fn write_word(&self, sink: &mut Vec<u32>) {
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               let opc_idx = sink.len();
               sink.push(0);
               let mut fields = self.fields.iter().collect::<Vec<&T>>();
               fields.sort_by(|a,b| a.opcode().cmp(&b.opcode()));
               for field in &self.fields {
-                field.write_word(opc_idx, sink);
+                field.write_word(opc_idx, sink, req);
               }
             }
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -722,12 +764,12 @@ impl Grammar {
 
           pub trait BitField {
             fn opcode(&self) -> u32;
-            fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>);
+            fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>, req: &mut ModuleRequirements);
             fn read_word(chunk: &[u32], opc: &mut u32, idx: &mut usize) -> Self;
           }
 
           pub trait Asm {
-            fn write_word(&self, sink: &mut Vec<u32>);
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements);
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self;
           }
 
@@ -750,7 +792,7 @@ impl Grammar {
           }
 
           impl Asm for Opcode {
-            fn write_word(&self, sink: &mut Vec<u32>) {
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               let mark = sink.len();
               sink.push(self.opcode());
               match self {
@@ -778,9 +820,24 @@ impl Grammar {
 
           #(#operand_impls)*
 
+          #[derive(Debug, Default, Clone)]
+          pub struct ModuleRequirements {
+            pub cap:  std::collections::HashSet<Capability>,
+            pub ext:  std::collections::HashSet<String>,
+          }
+
+          impl ModuleRequirements {
+            pub fn add_cap(&mut self, cap: Capability) {
+              self.cap.insert(cap);
+            }
+            pub fn add_ext(&mut self, ext: String) {
+              self.ext.insert(ext);
+            }
+          }
+
           impl<T: Asm> Asm for Option<T> {
-            fn write_word(&self, sink: &mut Vec<u32>) {
-              self.as_ref().map(|t| t.write_word(sink));
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+              self.as_ref().map(|t| t.write_word(sink, req));
             }
 
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -793,9 +850,9 @@ impl Grammar {
           }
 
           impl<T: Asm, U: Asm> Asm for (T, U) {
-            fn write_word(&self, sink: &mut Vec<u32>) {
-              self.0.write_word(sink);
-              self.1.write_word(sink);
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+              self.0.write_word(sink, req);
+              self.1.write_word(sink, req);
             }
 
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -806,8 +863,8 @@ impl Grammar {
           }
 
           impl<T: Asm> Asm for Box<T> {
-            fn write_word(&self, sink: &mut Vec<u32>) {
-              self.as_ref().write_word(sink);
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+              self.as_ref().write_word(sink, req);
             }
 
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -816,8 +873,8 @@ impl Grammar {
           }
 
           impl<T: Asm> Asm for Vec<T> {
-            fn write_word(&self, sink: &mut Vec<u32>) {
-              self.iter().for_each(|t| t.write_word(sink));
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+              self.iter().for_each(|t| t.write_word(sink, req));
             }
 
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -830,7 +887,7 @@ impl Grammar {
           }
 
           impl Asm for u32 {
-            fn write_word(&self, sink: &mut Vec<u32>) {
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               sink.push(*self);
             }
 
@@ -841,7 +898,7 @@ impl Grammar {
           }
 
           impl Asm for String {
-            fn write_word(&self, sink: &mut Vec<u32>) {
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               let mark = sink.len();
               let strlen = (self.len() >> 2) + 1;
               sink.resize(mark + strlen, 0);
@@ -875,7 +932,7 @@ impl Grammar {
           }
 
           impl Asm for ID {
-            fn write_word(&self,sink: &mut Vec<u32>) {
+            fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
               sink.push(self.0);
             }
             fn read_word(chunk: &[u32], idx: &mut usize) -> Self {

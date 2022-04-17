@@ -7,11 +7,11 @@ function traverse(){
     done
   else
     mkdir -p ./bin/$(dirname $1)
-    glslc -c $1 -o ./bin/${1%.*}.spv 2> /dev/null
+    glslc -c $1 -o ./bin/$1.spv 2> /dev/null
     if [[ $? -eq 0 ]]; then
-      spirv-val ./bin/${1%.*}.spv
+      spirv-val ./bin/$1.spv
       mkdir -p ./asm/$(dirname $1)
-      spirv-dis ./bin/${1%.*}.spv --raw-id> ./asm/${1%.*}.s
+      spirv-dis ./bin/$1.spv > ./asm/$1.s
     fi
   fi
 }

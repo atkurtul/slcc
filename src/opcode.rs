@@ -1747,13 +1747,13 @@ pub struct BitEnum<T: BitField> {
     fields: Vec<T>,
 }
 impl<T: BitField> Asm for BitEnum<T> {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         let opc_idx = sink.len();
         sink.push(0);
         let mut fields = self.fields.iter().collect::<Vec<&T>>();
         fields.sort_by(|a, b| a.opcode().cmp(&b.opcode()));
         for field in &self.fields {
-            field.write_word(opc_idx, sink);
+            field.write_word(opc_idx, sink, req);
         }
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -1768,11 +1768,11 @@ impl<T: BitField> Asm for BitEnum<T> {
 }
 pub trait BitField {
     fn opcode(&self) -> u32;
-    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>);
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>, req: &mut ModuleRequirements);
     fn read_word(chunk: &[u32], opc: &mut u32, idx: &mut usize) -> Self;
 }
 pub trait Asm {
-    fn write_word(&self, sink: &mut Vec<u32>);
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements);
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self;
 }
 impl Opcode {
@@ -4745,2929 +4745,2929 @@ impl Opcode {
     }
 }
 impl Asm for Opcode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         let mark = sink.len();
         sink.push(self.opcode());
         match self {
             OpNop => (),
             OpUndef(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSourceContinued(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpSource(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSourceExtension(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpName(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpMemberName(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpString(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpLine(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpExtension(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpExtInstImport(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpExtInst(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpMemoryModel(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpEntryPoint(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpExecutionMode(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpCapability(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeVoid(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeBool(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeInt(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTypeFloat(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeVector(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTypeMatrix(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTypeImage(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpTypeSampler(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeSampledImage(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeArray(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTypeRuntimeArray(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeStruct(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeOpaque(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypePointer(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTypeFunction(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTypeEvent(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeDeviceEvent(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeReserveId(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeQueue(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypePipe(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeForwardPointer(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpConstantTrue(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpConstantFalse(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpConstant(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConstantComposite(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConstantSampler(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpConstantNull(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSpecConstantTrue(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSpecConstantFalse(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSpecConstant(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSpecConstantComposite(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
-            OpSpecConstantOp(_, _, specop) => specop.write_word(sink),
+            OpSpecConstantOp(_, _, specop) => specop.write_word(sink, req),
             OpFunction(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFunctionParameter(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpFunctionEnd => (),
             OpFunctionCall(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpVariable(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpImageTexelPointer(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpLoad(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpStore(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpCopyMemory(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpCopyMemorySized(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpAccessChain(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpInBoundsAccessChain(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpPtrAccessChain(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpArrayLength(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGenericPtrMemSemantics(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpInBoundsPtrAccessChain(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpDecorate(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpMemberDecorate(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpDecorationGroup(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpGroupDecorate(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpGroupMemberDecorate(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpVectorExtractDynamic(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpVectorInsertDynamic(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpVectorShuffle(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpCompositeConstruct(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpCompositeExtract(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpCompositeInsert(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpCopyObject(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTranspose(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSampledImage(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpImageSampleImplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSampleExplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSampleDrefImplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSampleDrefExplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSampleProjImplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSampleProjExplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSampleProjDrefImplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSampleProjDrefExplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageFetch(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageGather(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageDrefGather(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageRead(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageWrite(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpImage(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpImageQueryFormat(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpImageQueryOrder(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpImageQuerySizeLod(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpImageQuerySize(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpImageQueryLod(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpImageQueryLevels(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpImageQuerySamples(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertFToU(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertFToS(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertSToF(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertUToF(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpUConvert(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSConvert(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpFConvert(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpQuantizeToF16(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertPtrToU(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSatConvertSToU(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSatConvertUToS(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertUToPtr(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpPtrCastToGeneric(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGenericCastToPtr(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGenericCastToPtrExplicit(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpBitcast(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSNegate(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpFNegate(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpIAdd(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFAdd(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpISub(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFSub(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIMul(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFMul(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUDiv(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSDiv(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFDiv(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUMod(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSRem(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSMod(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFRem(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFMod(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpVectorTimesScalar(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpMatrixTimesScalar(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpVectorTimesMatrix(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpMatrixTimesVector(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpMatrixTimesMatrix(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpOuterProduct(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpDot(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIAddCarry(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpISubBorrow(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUMulExtended(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSMulExtended(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpAny(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpAll(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpIsNan(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpIsInf(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpIsFinite(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpIsNormal(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSignBitSet(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpLessOrGreater(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpOrdered(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUnordered(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpLogicalEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpLogicalNotEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpLogicalOr(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpLogicalAnd(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpLogicalNot(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSelect(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpIEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpINotEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUGreaterThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSGreaterThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUGreaterThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSGreaterThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpULessThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSLessThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpULessThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSLessThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFOrdEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFUnordEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFOrdNotEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFUnordNotEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFOrdLessThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFUnordLessThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFOrdGreaterThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFUnordGreaterThan(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFOrdLessThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFUnordLessThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFOrdGreaterThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFUnordGreaterThanEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpShiftRightLogical(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpShiftRightArithmetic(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpShiftLeftLogical(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpBitwiseOr(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpBitwiseXor(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpBitwiseAnd(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpNot(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpBitFieldInsert(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpBitFieldSExtract(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpBitFieldUExtract(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpBitReverse(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpBitCount(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpDPdx(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpDPdy(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpFwidth(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpDPdxFine(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpDPdyFine(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpFwidthFine(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpDPdxCoarse(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpDPdyCoarse(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpFwidthCoarse(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpEmitVertex => (),
             OpEndPrimitive => (),
             OpEmitStreamVertex(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpEndStreamPrimitive(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpControlBarrier(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpMemoryBarrier(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpAtomicLoad(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpAtomicStore(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpAtomicExchange(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicCompareExchange(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpAtomicCompareExchangeWeak(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpAtomicIIncrement(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpAtomicIDecrement(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpAtomicIAdd(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicISub(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicSMin(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicUMin(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicSMax(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicUMax(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicAnd(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicOr(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicXor(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpPhi(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpLoopMerge(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSelectionMerge(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpLabel(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpBranch(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpBranchConditional(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSwitch(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpKill => (),
             OpReturn => (),
             OpReturnValue(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpUnreachable => (),
             OpLifetimeStart(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpLifetimeStop(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpGroupAsyncCopy(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpGroupWaitEvents(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGroupAll(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupAny(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupBroadcast(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupIAdd(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupFAdd(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupFMin(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupUMin(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupSMin(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupFMax(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupUMax(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupSMax(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpReadPipe(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpWritePipe(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpReservedReadPipe(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpReservedWritePipe(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpReserveReadPipePackets(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpReserveWritePipePackets(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpCommitReadPipe(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpCommitWritePipe(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIsValidReserveId(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGetNumPipePackets(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGetMaxPipePackets(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupReserveReadPipePackets(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpGroupReserveWritePipePackets(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpGroupCommitReadPipe(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupCommitWritePipe(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpEnqueueMarker(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpEnqueueKernel(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
-                x10.write_word(sink);
-                x11.write_word(sink);
-                x12.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
+                x10.write_word(sink, req);
+                x11.write_word(sink, req);
+                x12.write_word(sink, req);
             }
             OpGetKernelNDrangeSubGroupCount(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpGetKernelNDrangeMaxSubGroupSize(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpGetKernelWorkGroupSize(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGetKernelPreferredWorkGroupSizeMultiple(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpRetainEvent(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpReleaseEvent(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpCreateUserEvent(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpIsValidEvent(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSetUserEventStatus(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpCaptureEventProfilingInfo(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGetDefaultQueue(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpBuildNDRange(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSparseSampleImplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSparseSampleExplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSparseSampleDrefImplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSparseSampleDrefExplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSparseSampleProjImplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSparseSampleProjExplicitLod(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSparseSampleProjDrefImplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSparseSampleProjDrefExplicitLod(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSparseFetch(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpImageSparseGather(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSparseDrefGather(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpImageSparseTexelsResident(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpNoLine => (),
             OpAtomicFlagTestAndSet(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpAtomicFlagClear(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpImageSparseRead(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSizeOf(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpTypePipeStorage(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpConstantPipeStorage(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpCreatePipeFromPipeStorage(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGetKernelLocalSizeForSubgroupCount(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpGetKernelMaxNumSubgroups(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpTypeNamedBarrier(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpNamedBarrierInitialize(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpMemoryNamedBarrier(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpModuleProcessed(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpExecutionModeId(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpDecorateId(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpGroupNonUniformElect(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGroupNonUniformAll(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformAny(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformAllEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformBroadcast(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformBroadcastFirst(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformBallot(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformInverseBallot(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformBallotBitExtract(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformBallotBitCount(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformBallotFindLSB(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformBallotFindMSB(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupNonUniformShuffle(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformShuffleXor(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformShuffleUp(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformShuffleDown(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformIAdd(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformFAdd(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformIMul(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformFMul(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformSMin(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformUMin(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformFMin(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformSMax(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformUMax(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformFMax(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformBitwiseAnd(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformBitwiseOr(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformBitwiseXor(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformLogicalAnd(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformLogicalOr(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformLogicalXor(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpGroupNonUniformQuadBroadcast(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupNonUniformQuadSwap(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpCopyLogical(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpPtrEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpPtrNotEqual(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpPtrDiff(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpTerminateInvocation => (),
             OpSubgroupBallotKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupFirstInvocationKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAllKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAnyKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAllEqualKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupReadInvocationKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpTraceRayKHR(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
-                x10.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
+                x10.write_word(sink, req);
             }
             OpExecuteCallableKHR(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpConvertUToAccelerationStructureKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpIgnoreIntersectionKHR => (),
             OpTerminateRayKHR => (),
             OpSDot(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpUDot(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSUDot(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSDotAccSat(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpUDotAccSat(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSUDotAccSat(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpTypeRayQueryKHR(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpRayQueryInitializeKHR(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpRayQueryTerminateKHR(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpRayQueryGenerateIntersectionKHR(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpRayQueryConfirmIntersectionKHR(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpRayQueryProceedKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpRayQueryGetIntersectionTypeKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpGroupIAddNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupFAddNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupFMinNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupUMinNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupSMinNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupFMaxNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupUMaxNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupSMaxNonUniformAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpFragmentMaskFetchAMD(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFragmentFetchAMD(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpReadClockKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpImageSampleFootprintNV(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpGroupNonUniformPartitionNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpWritePackedPrimitiveIndices4x8NV(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpReportIntersectionNV(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIgnoreIntersectionNV => (),
             OpTerminateRayNV => (),
             OpTraceNV(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
-                x10.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
+                x10.write_word(sink, req);
             }
             OpTraceMotionNV(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
-                x10.write_word(sink);
-                x11.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
+                x10.write_word(sink, req);
+                x11.write_word(sink, req);
             }
             OpTraceRayMotionNV(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
-                x10.write_word(sink);
-                x11.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
+                x10.write_word(sink, req);
+                x11.write_word(sink, req);
             }
             OpTypeAccelerationStructureNV(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpExecuteCallableNV(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeCooperativeMatrixNV(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpCooperativeMatrixLoadNV(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpCooperativeMatrixStoreNV(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpCooperativeMatrixMulAddNV(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpCooperativeMatrixLengthNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpBeginInvocationInterlockEXT => (),
             OpEndInvocationInterlockEXT => (),
             OpDemoteToHelperInvocation => (),
             OpIsHelperInvocationEXT(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpConvertUToImageNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertUToSamplerNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertImageToUNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertSamplerToUNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertUToSampledImageNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpConvertSampledImageToUNV(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSamplerImageAddressingModeNV(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpSubgroupShuffleINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupShuffleDownINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupShuffleUpINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupShuffleXorINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupBlockReadINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupBlockWriteINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSubgroupImageBlockReadINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupImageBlockWriteINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupImageMediaBlockReadINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupImageMediaBlockWriteINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpUCountLeadingZerosINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpUCountTrailingZerosINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpAbsISubINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpAbsUSubINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIAddSatINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUAddSatINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIAverageINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUAverageINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIAverageRoundedINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUAverageRoundedINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpISubSatINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUSubSatINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpIMul32x16INTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpUMul32x16INTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpConstantFunctionPointerINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpFunctionPointerCallINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpAsmTargetINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpAsmINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAsmCallINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpAtomicFMinEXT(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAtomicFMaxEXT(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpAssumeTrueKHR(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpExpectKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpDecorateString(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpMemberDecorateString(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpVmeImageINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpTypeVmeImageINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeAvcImePayloadINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcRefPayloadINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcSicPayloadINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcMcePayloadINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcMceResultINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcImeResultINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcImeResultSingleReferenceStreamoutINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcImeResultDualReferenceStreamoutINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcImeSingleReferenceStreaminINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcImeDualReferenceStreaminINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcRefResultINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpTypeAvcSicResultINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultInterBaseMultiReferencePenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceSetInterBaseMultiReferencePenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultInterShapePenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceSetInterShapePenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultInterDirectionPenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceSetInterDirectionPenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultIntraLumaShapePenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultInterMotionVectorCostTableINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultHighPenaltyCostTableINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultMediumPenaltyCostTableINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultLowPenaltyCostTableINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSubgroupAvcMceSetMotionVectorCostFunctionINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultIntraLumaModePenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultNonDcLumaIntraPenaltyINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSubgroupAvcMceGetDefaultIntraChromaModeBasePenaltyINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpSubgroupAvcMceSetAcOnlyHaarINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceSetSourceInterlacedFieldPolarityINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceSetSingleReferenceInterlacedFieldPolarityINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcMceSetDualReferenceInterlacedFieldPolaritiesINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcMceConvertToImePayloadINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceConvertToImeResultINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceConvertToRefPayloadINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceConvertToRefResultINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceConvertToSicPayloadINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceConvertToSicResultINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetMotionVectorsINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetInterDistortionsINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetBestInterDistortionsINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetInterMajorShapeINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetInterMinorShapeINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetInterDirectionsINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetInterMotionVectorCountINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetInterReferenceIdsINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcMceGetInterReferenceInterlacedFieldPolaritiesINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeInitializeINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeSetSingleReferenceINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeSetDualReferenceINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcImeRefWindowSizeINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeAdjustRefOffsetINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcImeConvertToMcePayloadINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeSetMaxMotionVectorCountINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeSetUnidirectionalMixDisableINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeSetEarlySearchTerminationThresholdINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeSetWeightedSadINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithSingleReferenceINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithDualReferenceINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithSingleReferenceStreaminINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithDualReferenceStreaminINTEL(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithSingleReferenceStreamoutINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithDualReferenceStreamoutINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithSingleReferenceStreaminoutINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcImeEvaluateWithDualReferenceStreaminoutINTEL(
                 x0,
@@ -7678,38 +7678,38 @@ impl Asm for Opcode {
                 x5,
                 x6,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpSubgroupAvcImeConvertToMceResultINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeGetSingleReferenceStreaminINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeGetDualReferenceStreaminINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeStripSingleReferenceStreamoutINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeStripDualReferenceStreamoutINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeGetStreamoutSingleReferenceMajorShapeMotionVectorsINTEL(
                 x0,
@@ -7717,10 +7717,10 @@ impl Asm for Opcode {
                 x2,
                 x3,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeGetStreamoutSingleReferenceMajorShapeDistortionsINTEL(
                 x0,
@@ -7728,10 +7728,10 @@ impl Asm for Opcode {
                 x2,
                 x3,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeGetStreamoutSingleReferenceMajorShapeReferenceIdsINTEL(
                 x0,
@@ -7739,10 +7739,10 @@ impl Asm for Opcode {
                 x2,
                 x3,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeGetStreamoutDualReferenceMajorShapeMotionVectorsINTEL(
                 x0,
@@ -7751,11 +7751,11 @@ impl Asm for Opcode {
                 x3,
                 x4,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeGetStreamoutDualReferenceMajorShapeDistortionsINTEL(
                 x0,
@@ -7764,11 +7764,11 @@ impl Asm for Opcode {
                 x3,
                 x4,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeGetStreamoutDualReferenceMajorShapeReferenceIdsINTEL(
                 x0,
@@ -7777,137 +7777,137 @@ impl Asm for Opcode {
                 x3,
                 x4,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcImeGetBorderReachedINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcImeGetTruncatedSearchIndicationINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeGetUnidirectionalEarlySearchTerminationINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeGetWeightingPatternMinimumMotionVectorINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcImeGetWeightingPatternMinimumDistortionINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcFmeInitializeINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpSubgroupAvcBmeInitializeINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpSubgroupAvcRefConvertToMcePayloadINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcRefSetBidirectionalMixDisableINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcRefSetBilinearFilterEnableINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcRefEvaluateWithSingleReferenceINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcRefEvaluateWithDualReferenceINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcRefEvaluateWithMultiReferenceINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcRefEvaluateWithMultiReferenceInterlacedINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcRefConvertToMceResultINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicInitializeINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicConfigureSkcINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpSubgroupAvcSicConfigureIpeLumaINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpSubgroupAvcSicConfigureIpeLumaChromaINTEL(
                 x0,
@@ -7924,926 +7924,926 @@ impl Asm for Opcode {
                 x11,
                 x12,
             ) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
-                x10.write_word(sink);
-                x11.write_word(sink);
-                x12.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
+                x10.write_word(sink, req);
+                x11.write_word(sink, req);
+                x12.write_word(sink, req);
             }
             OpSubgroupAvcSicGetMotionVectorMaskINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcSicConvertToMcePayloadINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicSetIntraLumaShapePenaltyINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcSicSetIntraLumaModeCostFunctionINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcSicSetIntraChromaModeCostFunctionINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcSicSetBilinearFilterEnableINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicSetSkcForwardTransformEnableINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcSicSetBlockBasedRawSkipSadINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcSicEvaluateIpeINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpSubgroupAvcSicEvaluateWithSingleReferenceINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcSicEvaluateWithDualReferenceINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcSicEvaluateWithMultiReferenceINTEL(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpSubgroupAvcSicEvaluateWithMultiReferenceInterlacedINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpSubgroupAvcSicConvertToMceResultINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetIpeLumaShapeINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetBestIpeLumaDistortionINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetBestIpeChromaDistortionINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetPackedIpeLumaModesINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetIpeChromaModeINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetPackedSkcLumaCountThresholdINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetPackedSkcLumaSumThresholdINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSubgroupAvcSicGetInterRawSadsINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpVariableLengthArrayINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpSaveMemoryINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpRestoreMemoryINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpArbitraryFloatSinCosPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpArbitraryFloatCastINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatCastFromIntINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatCastToIntINTEL(x0, x1, x2, x3, x4, x5, x6) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
             }
             OpArbitraryFloatAddINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatSubINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatMulINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatDivINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatGTINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpArbitraryFloatGEINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpArbitraryFloatLTINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpArbitraryFloatLEINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpArbitraryFloatEQINTEL(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpArbitraryFloatRecipINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatRSqrtINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatCbrtINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatHypotINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatSqrtINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatLogINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatLog2INTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatLog10INTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatLog1pINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatExpINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatExp2INTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatExp10INTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatExpm1INTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatSinINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatCosINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatSinCosINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatSinPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatCosPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatASinINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatASinPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatACosINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatACosPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatATanINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatATanPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
             }
             OpArbitraryFloatATan2INTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatPowINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatPowRINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
-                x9.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
+                x9.write_word(sink, req);
             }
             OpArbitraryFloatPowNINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpLoopControlINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpAliasDomainDeclINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpAliasScopeDeclINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpAliasScopeListDeclINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpFixedSqrtINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedRecipINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedRsqrtINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedSinINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedCosINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedSinCosINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedSinPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedCosPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedSinCosPiINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedLogINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpFixedExpINTEL(x0, x1, x2, x3, x4, x5, x6, x7, x8) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
-                x6.write_word(sink);
-                x7.write_word(sink);
-                x8.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
+                x6.write_word(sink, req);
+                x7.write_word(sink, req);
+                x8.write_word(sink, req);
             }
             OpPtrCastToCrossWorkgroupINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpCrossWorkgroupCastToPtrINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpReadPipeBlockingINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpWritePipeBlockingINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpFPGARegINTEL(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetRayTMinKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpRayQueryGetRayFlagsKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpRayQueryGetIntersectionTKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionInstanceCustomIndexKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionInstanceIdKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionInstanceShaderBindingTableRecordOffsetKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionGeometryIndexKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionPrimitiveIndexKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionBarycentricsKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionFrontFaceKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionCandidateAABBOpaqueKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpRayQueryGetIntersectionObjectRayDirectionKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionObjectRayOriginKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetWorldRayDirectionKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpRayQueryGetWorldRayOriginKHR(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpRayQueryGetIntersectionObjectToWorldKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpRayQueryGetIntersectionWorldToObjectKHR(x0, x1, x2, x3) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
             }
             OpAtomicFAddEXT(x0, x1, x2, x3, x4, x5) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
-                x5.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
+                x5.write_word(sink, req);
             }
             OpTypeBufferSurfaceINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             OpTypeStructContinuedINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpConstantCompositeContinuedINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpSpecConstantCompositeContinuedINTEL(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             OpControlBarrierArriveINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpControlBarrierWaitINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             OpGroupIMulKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupFMulKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupBitwiseAndKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupBitwiseOrKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupBitwiseXorKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupLogicalAndKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupLogicalOrKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             OpGroupLogicalXorKHR(x0, x1, x2, x3, x4) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
-                x3.write_word(sink);
-                x4.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
+                x3.write_word(sink, req);
+                x4.write_word(sink, req);
             }
             what => panic!("{:?}", what),
         }
@@ -13568,49 +13568,59 @@ impl BitField for ImageOperandsBits {
     fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>) {
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         use ImageOperandsBits::*;
         sink[opc_idx] |= self.opcode();
         match self {
-            None => (),
+            None => {}
             Bias(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             Lod(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             Grad(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             ConstOffset(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             Offset(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::ImageGatherExtended);
+                x0.write_word(sink, req);
             }
             ConstOffsets(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::ImageGatherExtended);
+                x0.write_word(sink, req);
             }
             Sample(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             MinLod(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::MinLod);
+                x0.write_word(sink, req);
             }
             MakeTexelAvailable(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VulkanMemoryModel);
+                x0.write_word(sink, req);
             }
             MakeTexelVisible(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VulkanMemoryModel);
+                x0.write_word(sink, req);
             }
-            NonPrivateTexel => (),
-            VolatileTexel => (),
-            SignExtend => (),
-            ZeroExtend => (),
-            Nontemporal => (),
+            NonPrivateTexel => {
+                req.add_cap(Capability::VulkanMemoryModel);
+            }
+            VolatileTexel => {
+                req.add_cap(Capability::VulkanMemoryModel);
+            }
+            SignExtend => {}
+            ZeroExtend => {}
+            Nontemporal => {}
             Offsets(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             what => panic!("{:?}", what),
         }
@@ -13693,7 +13703,7 @@ impl std::ops::BitAnd<FPFastMathMode> for FPFastMathMode {
     }
 }
 impl Asm for FPFastMathMode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -13719,7 +13729,7 @@ impl std::ops::BitAnd<SelectionControl> for SelectionControl {
     }
 }
 impl Asm for SelectionControl {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -13731,55 +13741,71 @@ impl BitField for LoopControlBits {
     fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>) {
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         use LoopControlBits::*;
         sink[opc_idx] |= self.opcode();
         match self {
-            None => (),
-            Unroll => (),
-            DontUnroll => (),
-            DependencyInfinite => (),
+            None => {}
+            Unroll => {}
+            DontUnroll => {}
+            DependencyInfinite => {}
             DependencyLength(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             MinIterations(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             MaxIterations(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             IterationMultiple(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             PeelCount(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             PartialCount(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             InitiationIntervalINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             MaxConcurrencyINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             DependencyArrayINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             PipelineEnableINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             LoopCoalesceINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             MaxInterleavingINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             SpeculatedIterationsINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             NoFusionINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGALoopControlsINTEL);
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+                x0.write_word(sink, req);
             }
             what => panic!("{:?}", what),
         }
@@ -13871,7 +13897,7 @@ impl std::ops::BitAnd<FunctionControl> for FunctionControl {
     }
 }
 impl Asm for FunctionControl {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -13897,7 +13923,7 @@ impl std::ops::BitAnd<MemorySemantics> for MemorySemantics {
     }
 }
 impl Asm for MemorySemantics {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -13909,28 +13935,36 @@ impl BitField for MemoryAccessBits {
     fn opcode(&self) -> u32 {
         unsafe { std::mem::transmute_copy(self) }
     }
-    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>) {
+    fn write_word(&self, opc_idx: usize, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         use MemoryAccessBits::*;
         sink[opc_idx] |= self.opcode();
         match self {
-            None => (),
-            Volatile => (),
+            None => {}
+            Volatile => {}
             Aligned(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
-            Nontemporal => (),
+            Nontemporal => {}
             MakePointerAvailable(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VulkanMemoryModel);
+                x0.write_word(sink, req);
             }
             MakePointerVisible(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VulkanMemoryModel);
+                x0.write_word(sink, req);
             }
-            NonPrivatePointer => (),
+            NonPrivatePointer => {
+                req.add_cap(Capability::VulkanMemoryModel);
+            }
             AliasScopeINTELMask(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::MemoryAccessAliasingINTEL);
+                req.add_ext("SPV_INTEL_memory_access_aliasing".to_string());
+                x0.write_word(sink, req);
             }
             NoAliasINTELMask(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::MemoryAccessAliasingINTEL);
+                req.add_ext("SPV_INTEL_memory_access_aliasing".to_string());
+                x0.write_word(sink, req);
             }
             what => panic!("{:?}", what),
         }
@@ -13986,7 +14020,7 @@ impl std::ops::BitAnd<KernelProfilingInfo> for KernelProfilingInfo {
     }
 }
 impl Asm for KernelProfilingInfo {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -14012,7 +14046,7 @@ impl std::ops::BitAnd<RayFlags> for RayFlags {
     }
 }
 impl Asm for RayFlags {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -14038,7 +14072,7 @@ impl std::ops::BitAnd<FragmentShadingRate> for FragmentShadingRate {
     }
 }
 impl Asm for FragmentShadingRate {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -14052,18 +14086,18 @@ impl SourceLanguage {
     }
 }
 impl Asm for SourceLanguage {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use SourceLanguage::*;
         match self {
-            Unknown => (),
-            ESSL => (),
-            GLSL => (),
-            OpenCL_C => (),
-            OpenCL_CPP => (),
-            HLSL => (),
-            CPP_for_OpenCL => (),
-            SYCL => (),
+            Unknown => {}
+            ESSL => {}
+            GLSL => {}
+            OpenCL_C => {}
+            OpenCL_CPP => {}
+            HLSL => {}
+            CPP_for_OpenCL => {}
+            SYCL => {}
             what => panic!("{:?}", what),
         }
     }
@@ -14089,25 +14123,61 @@ impl ExecutionModel {
     }
 }
 impl Asm for ExecutionModel {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use ExecutionModel::*;
         match self {
-            Vertex => (),
-            TessellationControl => (),
-            TessellationEvaluation => (),
-            Geometry => (),
-            Fragment => (),
-            GLCompute => (),
-            Kernel => (),
-            TaskNV => (),
-            MeshNV => (),
-            RayGenerationNV => (),
-            IntersectionNV => (),
-            AnyHitNV => (),
-            ClosestHitNV => (),
-            MissNV => (),
-            CallableNV => (),
+            Vertex => {
+                req.add_cap(Capability::Shader);
+            }
+            TessellationControl => {
+                req.add_cap(Capability::Tessellation);
+            }
+            TessellationEvaluation => {
+                req.add_cap(Capability::Tessellation);
+            }
+            Geometry => {
+                req.add_cap(Capability::Geometry);
+            }
+            Fragment => {
+                req.add_cap(Capability::Shader);
+            }
+            GLCompute => {
+                req.add_cap(Capability::Shader);
+            }
+            Kernel => {
+                req.add_cap(Capability::Kernel);
+            }
+            TaskNV => {
+                req.add_cap(Capability::MeshShadingNV);
+            }
+            MeshNV => {
+                req.add_cap(Capability::MeshShadingNV);
+            }
+            RayGenerationNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+            }
+            IntersectionNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+            }
+            AnyHitNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+            }
+            ClosestHitNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+            }
+            MissNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+            }
+            CallableNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14140,14 +14210,22 @@ impl AddressingModel {
     }
 }
 impl Asm for AddressingModel {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use AddressingModel::*;
         match self {
-            Logical => (),
-            Physical32 => (),
-            Physical64 => (),
-            PhysicalStorageBuffer64 => (),
+            Logical => {}
+            Physical32 => {
+                req.add_cap(Capability::Addresses);
+            }
+            Physical64 => {
+                req.add_cap(Capability::Addresses);
+            }
+            PhysicalStorageBuffer64 => {
+                req.add_cap(Capability::PhysicalStorageBufferAddresses);
+                req.add_ext("SPV_EXT_physical_storage_buffer".to_string());
+                req.add_ext("SPV_KHR_physical_storage_buffer".to_string());
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14169,14 +14247,22 @@ impl MemoryModel {
     }
 }
 impl Asm for MemoryModel {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use MemoryModel::*;
         match self {
-            Simple => (),
-            GLSL450 => (),
-            OpenCL => (),
-            Vulkan => (),
+            Simple => {
+                req.add_cap(Capability::Shader);
+            }
+            GLSL450 => {
+                req.add_cap(Capability::Shader);
+            }
+            OpenCL => {
+                req.add_cap(Capability::Kernel);
+            }
+            Vulkan => {
+                req.add_cap(Capability::VulkanMemoryModel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14198,139 +14284,274 @@ impl ExecutionMode {
     }
 }
 impl Asm for ExecutionMode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use ExecutionMode::*;
         match self {
             Invocations(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Geometry);
+                x0.write_word(sink, req);
             }
-            SpacingEqual => (),
-            SpacingFractionalEven => (),
-            SpacingFractionalOdd => (),
-            VertexOrderCw => (),
-            VertexOrderCcw => (),
-            PixelCenterInteger => (),
-            OriginUpperLeft => (),
-            OriginLowerLeft => (),
-            EarlyFragmentTests => (),
-            PointMode => (),
-            Xfb => (),
-            DepthReplacing => (),
-            DepthGreater => (),
-            DepthLess => (),
-            DepthUnchanged => (),
+            SpacingEqual => {
+                req.add_cap(Capability::Tessellation);
+            }
+            SpacingFractionalEven => {
+                req.add_cap(Capability::Tessellation);
+            }
+            SpacingFractionalOdd => {
+                req.add_cap(Capability::Tessellation);
+            }
+            VertexOrderCw => {
+                req.add_cap(Capability::Tessellation);
+            }
+            VertexOrderCcw => {
+                req.add_cap(Capability::Tessellation);
+            }
+            PixelCenterInteger => {
+                req.add_cap(Capability::Shader);
+            }
+            OriginUpperLeft => {
+                req.add_cap(Capability::Shader);
+            }
+            OriginLowerLeft => {
+                req.add_cap(Capability::Shader);
+            }
+            EarlyFragmentTests => {
+                req.add_cap(Capability::Shader);
+            }
+            PointMode => {
+                req.add_cap(Capability::Tessellation);
+            }
+            Xfb => {
+                req.add_cap(Capability::TransformFeedback);
+            }
+            DepthReplacing => {
+                req.add_cap(Capability::Shader);
+            }
+            DepthGreater => {
+                req.add_cap(Capability::Shader);
+            }
+            DepthLess => {
+                req.add_cap(Capability::Shader);
+            }
+            DepthUnchanged => {
+                req.add_cap(Capability::Shader);
+            }
             LocalSize(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             LocalSizeHint(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
-            InputPoints => (),
-            InputLines => (),
-            InputLinesAdjacency => (),
-            Triangles => (),
-            InputTrianglesAdjacency => (),
-            Quads => (),
-            Isolines => (),
+            InputPoints => {
+                req.add_cap(Capability::Geometry);
+            }
+            InputLines => {
+                req.add_cap(Capability::Geometry);
+            }
+            InputLinesAdjacency => {
+                req.add_cap(Capability::Geometry);
+            }
+            Triangles => {
+                req.add_cap(Capability::Geometry);
+                req.add_cap(Capability::Tessellation);
+            }
+            InputTrianglesAdjacency => {
+                req.add_cap(Capability::Geometry);
+            }
+            Quads => {
+                req.add_cap(Capability::Tessellation);
+            }
+            Isolines => {
+                req.add_cap(Capability::Tessellation);
+            }
             OutputVertices(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Geometry);
+                req.add_cap(Capability::Tessellation);
+                req.add_cap(Capability::MeshShadingNV);
+                x0.write_word(sink, req);
             }
-            OutputPoints => (),
-            OutputLineStrip => (),
-            OutputTriangleStrip => (),
+            OutputPoints => {
+                req.add_cap(Capability::Geometry);
+                req.add_cap(Capability::MeshShadingNV);
+            }
+            OutputLineStrip => {
+                req.add_cap(Capability::Geometry);
+            }
+            OutputTriangleStrip => {
+                req.add_cap(Capability::Geometry);
+            }
             VecTypeHint(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
             }
-            ContractionOff => (),
-            Initializer => (),
-            Finalizer => (),
+            ContractionOff => {
+                req.add_cap(Capability::Kernel);
+            }
+            Initializer => {
+                req.add_cap(Capability::Kernel);
+            }
+            Finalizer => {
+                req.add_cap(Capability::Kernel);
+            }
             SubgroupSize(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::SubgroupDispatch);
+                x0.write_word(sink, req);
             }
             SubgroupsPerWorkgroup(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::SubgroupDispatch);
+                x0.write_word(sink, req);
             }
             SubgroupsPerWorkgroupId(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::SubgroupDispatch);
+                x0.write_word(sink, req);
             }
             LocalSizeId(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             LocalSizeHintId(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
-            SubgroupUniformControlFlowKHR => (),
-            PostDepthCoverage => (),
+            SubgroupUniformControlFlowKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_subgroup_uniform_control_flow".to_string());
+            }
+            PostDepthCoverage => {
+                req.add_cap(Capability::SampleMaskPostDepthCoverage);
+                req.add_ext("SPV_KHR_post_depth_coverage".to_string());
+            }
             DenormPreserve(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::DenormPreserve);
+                req.add_ext("SPV_KHR_float_controls".to_string());
+                x0.write_word(sink, req);
             }
             DenormFlushToZero(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::DenormFlushToZero);
+                req.add_ext("SPV_KHR_float_controls".to_string());
+                x0.write_word(sink, req);
             }
             SignedZeroInfNanPreserve(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::SignedZeroInfNanPreserve);
+                req.add_ext("SPV_KHR_float_controls".to_string());
+                x0.write_word(sink, req);
             }
             RoundingModeRTE(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::RoundingModeRTE);
+                req.add_ext("SPV_KHR_float_controls".to_string());
+                x0.write_word(sink, req);
             }
             RoundingModeRTZ(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::RoundingModeRTZ);
+                req.add_ext("SPV_KHR_float_controls".to_string());
+                x0.write_word(sink, req);
             }
-            StencilRefReplacingEXT => (),
-            OutputLinesNV => (),
+            StencilRefReplacingEXT => {
+                req.add_cap(Capability::StencilExportEXT);
+                req.add_ext("SPV_EXT_shader_stencil_export".to_string());
+            }
+            OutputLinesNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
             OutputPrimitivesNV(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+                x0.write_word(sink, req);
             }
-            DerivativeGroupQuadsNV => (),
-            DerivativeGroupLinearNV => (),
-            OutputTrianglesNV => (),
-            PixelInterlockOrderedEXT => (),
-            PixelInterlockUnorderedEXT => (),
-            SampleInterlockOrderedEXT => (),
-            SampleInterlockUnorderedEXT => (),
-            ShadingRateInterlockOrderedEXT => (),
-            ShadingRateInterlockUnorderedEXT => (),
+            DerivativeGroupQuadsNV => {
+                req.add_cap(Capability::ComputeDerivativeGroupQuadsNV);
+                req.add_ext("SPV_NV_compute_shader_derivatives".to_string());
+            }
+            DerivativeGroupLinearNV => {
+                req.add_cap(Capability::ComputeDerivativeGroupLinearNV);
+                req.add_ext("SPV_NV_compute_shader_derivatives".to_string());
+            }
+            OutputTrianglesNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            PixelInterlockOrderedEXT => {
+                req.add_cap(Capability::FragmentShaderPixelInterlockEXT);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            PixelInterlockUnorderedEXT => {
+                req.add_cap(Capability::FragmentShaderPixelInterlockEXT);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            SampleInterlockOrderedEXT => {
+                req.add_cap(Capability::FragmentShaderSampleInterlockEXT);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            SampleInterlockUnorderedEXT => {
+                req.add_cap(Capability::FragmentShaderSampleInterlockEXT);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            ShadingRateInterlockOrderedEXT => {
+                req.add_cap(Capability::FragmentShaderShadingRateInterlockEXT);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            ShadingRateInterlockUnorderedEXT => {
+                req.add_cap(Capability::FragmentShaderShadingRateInterlockEXT);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
             SharedLocalMemorySizeINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VectorComputeINTEL);
+                x0.write_word(sink, req);
             }
             RoundingModeRTPINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::RoundToInfinityINTEL);
+                x0.write_word(sink, req);
             }
             RoundingModeRTNINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::RoundToInfinityINTEL);
+                x0.write_word(sink, req);
             }
             FloatingPointModeALTINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::RoundToInfinityINTEL);
+                x0.write_word(sink, req);
             }
             FloatingPointModeIEEEINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::RoundToInfinityINTEL);
+                x0.write_word(sink, req);
             }
             MaxWorkgroupSizeINTEL(x0, x1, x2) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
-                x2.write_word(sink);
+                req.add_cap(Capability::KernelAttributesINTEL);
+                req.add_ext("SPV_INTEL_kernel_attributes".to_string());
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
+                x2.write_word(sink, req);
             }
             MaxWorkDimINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::KernelAttributesINTEL);
+                req.add_ext("SPV_INTEL_kernel_attributes".to_string());
+                x0.write_word(sink, req);
             }
-            NoGlobalOffsetINTEL => (),
+            NoGlobalOffsetINTEL => {
+                req.add_cap(Capability::KernelAttributesINTEL);
+                req.add_ext("SPV_INTEL_kernel_attributes".to_string());
+            }
             NumSIMDWorkitemsINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAKernelAttributesINTEL);
+                req.add_ext("SPV_INTEL_kernel_attributes".to_string());
+                x0.write_word(sink, req);
             }
             SchedulerTargetFmaxMhzINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAKernelAttributesINTEL);
+                x0.write_word(sink, req);
             }
             NamedBarrierCountINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VectorComputeINTEL);
+                x0.write_word(sink, req);
             }
             what => panic!("{:?}", what),
         }
@@ -14505,33 +14726,93 @@ impl StorageClass {
     }
 }
 impl Asm for StorageClass {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use StorageClass::*;
         match self {
-            UniformConstant => (),
-            Input => (),
-            Uniform => (),
-            Output => (),
-            Workgroup => (),
-            CrossWorkgroup => (),
-            Private => (),
-            Function => (),
-            Generic => (),
-            PushConstant => (),
-            AtomicCounter => (),
-            Image => (),
-            StorageBuffer => (),
-            CallableDataNV => (),
-            IncomingCallableDataNV => (),
-            RayPayloadNV => (),
-            HitAttributeNV => (),
-            IncomingRayPayloadNV => (),
-            ShaderRecordBufferNV => (),
-            PhysicalStorageBuffer => (),
-            CodeSectionINTEL => (),
-            DeviceOnlyINTEL => (),
-            HostOnlyINTEL => (),
+            UniformConstant => {}
+            Input => {}
+            Uniform => {
+                req.add_cap(Capability::Shader);
+            }
+            Output => {
+                req.add_cap(Capability::Shader);
+            }
+            Workgroup => {}
+            CrossWorkgroup => {}
+            Private => {
+                req.add_cap(Capability::Shader);
+                req.add_cap(Capability::VectorComputeINTEL);
+            }
+            Function => {}
+            Generic => {
+                req.add_cap(Capability::GenericPointer);
+            }
+            PushConstant => {
+                req.add_cap(Capability::Shader);
+            }
+            AtomicCounter => {
+                req.add_cap(Capability::AtomicStorage);
+            }
+            Image => {}
+            StorageBuffer => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_storage_buffer_storage_class".to_string());
+                req.add_ext("SPV_KHR_variable_pointers".to_string());
+            }
+            CallableDataNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            IncomingCallableDataNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            RayPayloadNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            HitAttributeNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            IncomingRayPayloadNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            ShaderRecordBufferNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            PhysicalStorageBuffer => {
+                req.add_cap(Capability::PhysicalStorageBufferAddresses);
+                req.add_ext("SPV_EXT_physical_storage_buffer".to_string());
+                req.add_ext("SPV_KHR_physical_storage_buffer".to_string());
+            }
+            CodeSectionINTEL => {
+                req.add_cap(Capability::FunctionPointersINTEL);
+                req.add_ext("SPV_INTEL_function_pointers".to_string());
+            }
+            DeviceOnlyINTEL => {
+                req.add_cap(Capability::USMStorageClassesINTEL);
+                req.add_ext("SPV_INTEL_usm_storage_classes".to_string());
+            }
+            HostOnlyINTEL => {
+                req.add_cap(Capability::USMStorageClassesINTEL);
+                req.add_ext("SPV_INTEL_usm_storage_classes".to_string());
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14572,17 +14853,35 @@ impl Dim {
     }
 }
 impl Asm for Dim {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use Dim::*;
         match self {
-            _1D => (),
-            _2D => (),
-            _3D => (),
-            Cube => (),
-            Rect => (),
-            Buffer => (),
-            SubpassData => (),
+            _1D => {
+                req.add_cap(Capability::Sampled1D);
+                req.add_cap(Capability::Image1D);
+            }
+            _2D => {
+                req.add_cap(Capability::Shader);
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::ImageMSArray);
+            }
+            _3D => {}
+            Cube => {
+                req.add_cap(Capability::Shader);
+                req.add_cap(Capability::ImageCubeArray);
+            }
+            Rect => {
+                req.add_cap(Capability::SampledRect);
+                req.add_cap(Capability::ImageRect);
+            }
+            Buffer => {
+                req.add_cap(Capability::SampledBuffer);
+                req.add_cap(Capability::ImageBuffer);
+            }
+            SubpassData => {
+                req.add_cap(Capability::InputAttachment);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14607,15 +14906,25 @@ impl SamplerAddressingMode {
     }
 }
 impl Asm for SamplerAddressingMode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use SamplerAddressingMode::*;
         match self {
-            None => (),
-            ClampToEdge => (),
-            Clamp => (),
-            Repeat => (),
-            RepeatMirrored => (),
+            None => {
+                req.add_cap(Capability::Kernel);
+            }
+            ClampToEdge => {
+                req.add_cap(Capability::Kernel);
+            }
+            Clamp => {
+                req.add_cap(Capability::Kernel);
+            }
+            Repeat => {
+                req.add_cap(Capability::Kernel);
+            }
+            RepeatMirrored => {
+                req.add_cap(Capability::Kernel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14638,12 +14947,16 @@ impl SamplerFilterMode {
     }
 }
 impl Asm for SamplerFilterMode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use SamplerFilterMode::*;
         match self {
-            Nearest => (),
-            Linear => (),
+            Nearest => {
+                req.add_cap(Capability::Kernel);
+            }
+            Linear => {
+                req.add_cap(Capability::Kernel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14663,52 +14976,134 @@ impl ImageFormat {
     }
 }
 impl Asm for ImageFormat {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use ImageFormat::*;
         match self {
-            Unknown => (),
-            Rgba32f => (),
-            Rgba16f => (),
-            R32f => (),
-            Rgba8 => (),
-            Rgba8Snorm => (),
-            Rg32f => (),
-            Rg16f => (),
-            R11fG11fB10f => (),
-            R16f => (),
-            Rgba16 => (),
-            Rgb10A2 => (),
-            Rg16 => (),
-            Rg8 => (),
-            R16 => (),
-            R8 => (),
-            Rgba16Snorm => (),
-            Rg16Snorm => (),
-            Rg8Snorm => (),
-            R16Snorm => (),
-            R8Snorm => (),
-            Rgba32i => (),
-            Rgba16i => (),
-            Rgba8i => (),
-            R32i => (),
-            Rg32i => (),
-            Rg16i => (),
-            Rg8i => (),
-            R16i => (),
-            R8i => (),
-            Rgba32ui => (),
-            Rgba16ui => (),
-            Rgba8ui => (),
-            R32ui => (),
-            Rgb10a2ui => (),
-            Rg32ui => (),
-            Rg16ui => (),
-            Rg8ui => (),
-            R16ui => (),
-            R8ui => (),
-            R64ui => (),
-            R64i => (),
+            Unknown => {}
+            Rgba32f => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgba16f => {
+                req.add_cap(Capability::Shader);
+            }
+            R32f => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgba8 => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgba8Snorm => {
+                req.add_cap(Capability::Shader);
+            }
+            Rg32f => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg16f => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R11fG11fB10f => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R16f => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rgba16 => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rgb10A2 => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg16 => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg8 => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R16 => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R8 => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rgba16Snorm => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg16Snorm => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg8Snorm => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R16Snorm => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R8Snorm => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rgba32i => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgba16i => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgba8i => {
+                req.add_cap(Capability::Shader);
+            }
+            R32i => {
+                req.add_cap(Capability::Shader);
+            }
+            Rg32i => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg16i => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg8i => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R16i => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R8i => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rgba32ui => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgba16ui => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgba8ui => {
+                req.add_cap(Capability::Shader);
+            }
+            R32ui => {
+                req.add_cap(Capability::Shader);
+            }
+            Rgb10a2ui => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg32ui => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg16ui => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            Rg8ui => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R16ui => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R8ui => {
+                req.add_cap(Capability::StorageImageExtendedFormats);
+            }
+            R64ui => {
+                req.add_cap(Capability::Int64ImageEXT);
+            }
+            R64i => {
+                req.add_cap(Capability::Int64ImageEXT);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14768,30 +15163,70 @@ impl ImageChannelOrder {
     }
 }
 impl Asm for ImageChannelOrder {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use ImageChannelOrder::*;
         match self {
-            R => (),
-            A => (),
-            RG => (),
-            RA => (),
-            RGB => (),
-            RGBA => (),
-            BGRA => (),
-            ARGB => (),
-            Intensity => (),
-            Luminance => (),
-            Rx => (),
-            RGx => (),
-            RGBx => (),
-            Depth => (),
-            DepthStencil => (),
-            sRGB => (),
-            sRGBx => (),
-            sRGBA => (),
-            sBGRA => (),
-            ABGR => (),
+            R => {
+                req.add_cap(Capability::Kernel);
+            }
+            A => {
+                req.add_cap(Capability::Kernel);
+            }
+            RG => {
+                req.add_cap(Capability::Kernel);
+            }
+            RA => {
+                req.add_cap(Capability::Kernel);
+            }
+            RGB => {
+                req.add_cap(Capability::Kernel);
+            }
+            RGBA => {
+                req.add_cap(Capability::Kernel);
+            }
+            BGRA => {
+                req.add_cap(Capability::Kernel);
+            }
+            ARGB => {
+                req.add_cap(Capability::Kernel);
+            }
+            Intensity => {
+                req.add_cap(Capability::Kernel);
+            }
+            Luminance => {
+                req.add_cap(Capability::Kernel);
+            }
+            Rx => {
+                req.add_cap(Capability::Kernel);
+            }
+            RGx => {
+                req.add_cap(Capability::Kernel);
+            }
+            RGBx => {
+                req.add_cap(Capability::Kernel);
+            }
+            Depth => {
+                req.add_cap(Capability::Kernel);
+            }
+            DepthStencil => {
+                req.add_cap(Capability::Kernel);
+            }
+            sRGB => {
+                req.add_cap(Capability::Kernel);
+            }
+            sRGBx => {
+                req.add_cap(Capability::Kernel);
+            }
+            sRGBA => {
+                req.add_cap(Capability::Kernel);
+            }
+            sBGRA => {
+                req.add_cap(Capability::Kernel);
+            }
+            ABGR => {
+                req.add_cap(Capability::Kernel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14829,27 +15264,61 @@ impl ImageChannelDataType {
     }
 }
 impl Asm for ImageChannelDataType {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use ImageChannelDataType::*;
         match self {
-            SnormInt8 => (),
-            SnormInt16 => (),
-            UnormInt8 => (),
-            UnormInt16 => (),
-            UnormShort565 => (),
-            UnormShort555 => (),
-            UnormInt101010 => (),
-            SignedInt8 => (),
-            SignedInt16 => (),
-            SignedInt32 => (),
-            UnsignedInt8 => (),
-            UnsignedInt16 => (),
-            UnsignedInt32 => (),
-            HalfFloat => (),
-            Float => (),
-            UnormInt24 => (),
-            UnormInt101010_2 => (),
+            SnormInt8 => {
+                req.add_cap(Capability::Kernel);
+            }
+            SnormInt16 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnormInt8 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnormInt16 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnormShort565 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnormShort555 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnormInt101010 => {
+                req.add_cap(Capability::Kernel);
+            }
+            SignedInt8 => {
+                req.add_cap(Capability::Kernel);
+            }
+            SignedInt16 => {
+                req.add_cap(Capability::Kernel);
+            }
+            SignedInt32 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnsignedInt8 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnsignedInt16 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnsignedInt32 => {
+                req.add_cap(Capability::Kernel);
+            }
+            HalfFloat => {
+                req.add_cap(Capability::Kernel);
+            }
+            Float => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnormInt24 => {
+                req.add_cap(Capability::Kernel);
+            }
+            UnormInt101010_2 => {
+                req.add_cap(Capability::Kernel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14884,14 +15353,14 @@ impl FPRoundingMode {
     }
 }
 impl Asm for FPRoundingMode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use FPRoundingMode::*;
         match self {
-            RTE => (),
-            RTZ => (),
-            RTP => (),
-            RTN => (),
+            RTE => {}
+            RTZ => {}
+            RTP => {}
+            RTN => {}
             what => panic!("{:?}", what),
         }
     }
@@ -14913,12 +15382,16 @@ impl FPDenormMode {
     }
 }
 impl Asm for FPDenormMode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use FPDenormMode::*;
         match self {
-            Preserve => (),
-            FlushToZero => (),
+            Preserve => {
+                req.add_cap(Capability::FunctionFloatControlINTEL);
+            }
+            FlushToZero => {
+                req.add_cap(Capability::FunctionFloatControlINTEL);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14938,18 +15411,34 @@ impl QuantizationModes {
     }
 }
 impl Asm for QuantizationModes {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use QuantizationModes::*;
         match self {
-            TRN => (),
-            TRN_ZERO => (),
-            RND => (),
-            RND_ZERO => (),
-            RND_INF => (),
-            RND_MIN_INF => (),
-            RND_CONV => (),
-            RND_CONV_ODD => (),
+            TRN => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            TRN_ZERO => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            RND => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            RND_ZERO => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            RND_INF => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            RND_MIN_INF => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            RND_CONV => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            RND_CONV_ODD => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -14975,12 +15464,16 @@ impl FPOperationMode {
     }
 }
 impl Asm for FPOperationMode {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use FPOperationMode::*;
         match self {
-            IEEE => (),
-            ALT => (),
+            IEEE => {
+                req.add_cap(Capability::FunctionFloatControlINTEL);
+            }
+            ALT => {
+                req.add_cap(Capability::FunctionFloatControlINTEL);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15000,14 +15493,22 @@ impl OverflowModes {
     }
 }
 impl Asm for OverflowModes {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use OverflowModes::*;
         match self {
-            WRAP => (),
-            SAT => (),
-            SAT_ZERO => (),
-            SAT_SYM => (),
+            WRAP => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            SAT => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            SAT_ZERO => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
+            SAT_SYM => {
+                req.add_cap(Capability::ArbitraryPrecisionFixedPointINTEL);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15029,13 +15530,20 @@ impl LinkageType {
     }
 }
 impl Asm for LinkageType {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use LinkageType::*;
         match self {
-            Export => (),
-            Import => (),
-            LinkOnceODR => (),
+            Export => {
+                req.add_cap(Capability::Linkage);
+            }
+            Import => {
+                req.add_cap(Capability::Linkage);
+            }
+            LinkOnceODR => {
+                req.add_cap(Capability::Linkage);
+                req.add_ext("SPV_KHR_linkonce_odr".to_string());
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15056,13 +15564,19 @@ impl AccessQualifier {
     }
 }
 impl Asm for AccessQualifier {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use AccessQualifier::*;
         match self {
-            ReadOnly => (),
-            WriteOnly => (),
-            ReadWrite => (),
+            ReadOnly => {
+                req.add_cap(Capability::Kernel);
+            }
+            WriteOnly => {
+                req.add_cap(Capability::Kernel);
+            }
+            ReadWrite => {
+                req.add_cap(Capability::Kernel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15083,18 +15597,34 @@ impl FunctionParameterAttribute {
     }
 }
 impl Asm for FunctionParameterAttribute {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use FunctionParameterAttribute::*;
         match self {
-            Zext => (),
-            Sext => (),
-            ByVal => (),
-            Sret => (),
-            NoAlias => (),
-            NoCapture => (),
-            NoWrite => (),
-            NoReadWrite => (),
+            Zext => {
+                req.add_cap(Capability::Kernel);
+            }
+            Sext => {
+                req.add_cap(Capability::Kernel);
+            }
+            ByVal => {
+                req.add_cap(Capability::Kernel);
+            }
+            Sret => {
+                req.add_cap(Capability::Kernel);
+            }
+            NoAlias => {
+                req.add_cap(Capability::Kernel);
+            }
+            NoCapture => {
+                req.add_cap(Capability::Kernel);
+            }
+            NoWrite => {
+                req.add_cap(Capability::Kernel);
+            }
+            NoReadWrite => {
+                req.add_cap(Capability::Kernel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15120,216 +15650,391 @@ impl Decoration {
     }
 }
 impl Asm for Decoration {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use Decoration::*;
         match self {
-            RelaxedPrecision => (),
-            SpecId(x0) => {
-                x0.write_word(sink);
+            RelaxedPrecision => {
+                req.add_cap(Capability::Shader);
             }
-            Block => (),
-            BufferBlock => (),
-            RowMajor => (),
-            ColMajor => (),
+            SpecId(x0) => {
+                req.add_cap(Capability::Shader);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
+            }
+            Block => {
+                req.add_cap(Capability::Shader);
+            }
+            BufferBlock => {
+                req.add_cap(Capability::Shader);
+            }
+            RowMajor => {
+                req.add_cap(Capability::Matrix);
+            }
+            ColMajor => {
+                req.add_cap(Capability::Matrix);
+            }
             ArrayStride(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             MatrixStride(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Matrix);
+                x0.write_word(sink, req);
             }
-            GLSLShared => (),
-            GLSLPacked => (),
-            CPacked => (),
+            GLSLShared => {
+                req.add_cap(Capability::Shader);
+            }
+            GLSLPacked => {
+                req.add_cap(Capability::Shader);
+            }
+            CPacked => {
+                req.add_cap(Capability::Kernel);
+            }
             BuiltIn(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
-            NoPerspective => (),
-            Flat => (),
-            Patch => (),
-            Centroid => (),
-            Sample => (),
-            Invariant => (),
-            Restrict => (),
-            Aliased => (),
-            Volatile => (),
-            Constant => (),
-            Coherent => (),
-            NonWritable => (),
-            NonReadable => (),
-            Uniform => (),
+            NoPerspective => {
+                req.add_cap(Capability::Shader);
+            }
+            Flat => {
+                req.add_cap(Capability::Shader);
+            }
+            Patch => {
+                req.add_cap(Capability::Tessellation);
+            }
+            Centroid => {
+                req.add_cap(Capability::Shader);
+            }
+            Sample => {
+                req.add_cap(Capability::SampleRateShading);
+            }
+            Invariant => {
+                req.add_cap(Capability::Shader);
+            }
+            Restrict => {}
+            Aliased => {}
+            Volatile => {}
+            Constant => {
+                req.add_cap(Capability::Kernel);
+            }
+            Coherent => {}
+            NonWritable => {}
+            NonReadable => {}
+            Uniform => {
+                req.add_cap(Capability::Shader);
+                req.add_cap(Capability::UniformDecoration);
+            }
             UniformId(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                req.add_cap(Capability::UniformDecoration);
+                x0.write_word(sink, req);
             }
-            SaturatedConversion => (),
+            SaturatedConversion => {
+                req.add_cap(Capability::Kernel);
+            }
             Stream(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::GeometryStreams);
+                x0.write_word(sink, req);
             }
             Location(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             Component(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             Index(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             Binding(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             DescriptorSet(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             Offset(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Shader);
+                x0.write_word(sink, req);
             }
             XfbBuffer(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::TransformFeedback);
+                x0.write_word(sink, req);
             }
             XfbStride(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::TransformFeedback);
+                x0.write_word(sink, req);
             }
             FuncParamAttr(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
             }
             FPRoundingMode(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             FPFastMathMode(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
             }
             LinkageAttributes(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                req.add_cap(Capability::Linkage);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
-            NoContraction => (),
+            NoContraction => {
+                req.add_cap(Capability::Shader);
+            }
             InputAttachmentIndex(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::InputAttachment);
+                x0.write_word(sink, req);
             }
             Alignment(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
             }
             MaxByteOffset(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Addresses);
+                x0.write_word(sink, req);
             }
             AlignmentId(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Kernel);
+                x0.write_word(sink, req);
             }
             MaxByteOffsetId(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::Addresses);
+                x0.write_word(sink, req);
             }
-            NoSignedWrap => (),
-            NoUnsignedWrap => (),
-            ExplicitInterpAMD => (),
-            OverrideCoverageNV => (),
-            PassthroughNV => (),
-            ViewportRelativeNV => (),
+            NoSignedWrap => {
+                req.add_ext("SPV_KHR_no_integer_wrap_decoration".to_string());
+            }
+            NoUnsignedWrap => {
+                req.add_ext("SPV_KHR_no_integer_wrap_decoration".to_string());
+            }
+            ExplicitInterpAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            OverrideCoverageNV => {
+                req.add_cap(Capability::SampleMaskOverrideCoverageNV);
+                req.add_ext("SPV_NV_sample_mask_override_coverage".to_string());
+            }
+            PassthroughNV => {
+                req.add_cap(Capability::GeometryShaderPassthroughNV);
+                req.add_ext("SPV_NV_geometry_shader_passthrough".to_string());
+            }
+            ViewportRelativeNV => {
+                req.add_cap(Capability::ShaderViewportMaskNV);
+            }
             SecondaryViewportRelativeNV(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::ShaderStereoViewNV);
+                req.add_ext("SPV_NV_stereo_view_rendering".to_string());
+                x0.write_word(sink, req);
             }
-            PerPrimitiveNV => (),
-            PerViewNV => (),
-            PerTaskNV => (),
-            PerVertexKHR => (),
-            NonUniform => (),
-            RestrictPointer => (),
-            AliasedPointer => (),
-            BindlessSamplerNV => (),
-            BindlessImageNV => (),
-            BoundSamplerNV => (),
-            BoundImageNV => (),
+            PerPrimitiveNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            PerViewNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            PerTaskNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            PerVertexKHR => {
+                req.add_cap(Capability::FragmentBarycentricKHR);
+                req.add_cap(Capability::FragmentBarycentricKHR);
+                req.add_ext("SPV_NV_fragment_shader_barycentric".to_string());
+                req.add_ext("SPV_KHR_fragment_shader_barycentric".to_string());
+            }
+            NonUniform => {
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            RestrictPointer => {
+                req.add_cap(Capability::PhysicalStorageBufferAddresses);
+                req.add_ext("SPV_EXT_physical_storage_buffer".to_string());
+                req.add_ext("SPV_KHR_physical_storage_buffer".to_string());
+            }
+            AliasedPointer => {
+                req.add_cap(Capability::PhysicalStorageBufferAddresses);
+                req.add_ext("SPV_EXT_physical_storage_buffer".to_string());
+                req.add_ext("SPV_KHR_physical_storage_buffer".to_string());
+            }
+            BindlessSamplerNV => {
+                req.add_cap(Capability::BindlessTextureNV);
+            }
+            BindlessImageNV => {
+                req.add_cap(Capability::BindlessTextureNV);
+            }
+            BoundSamplerNV => {
+                req.add_cap(Capability::BindlessTextureNV);
+            }
+            BoundImageNV => {
+                req.add_cap(Capability::BindlessTextureNV);
+            }
             SIMTCallINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VectorComputeINTEL);
+                x0.write_word(sink, req);
             }
-            ReferencedIndirectlyINTEL => (),
+            ReferencedIndirectlyINTEL => {
+                req.add_cap(Capability::IndirectReferencesINTEL);
+                req.add_ext("SPV_INTEL_function_pointers".to_string());
+            }
             ClobberINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::AsmINTEL);
+                x0.write_word(sink, req);
             }
-            SideEffectsINTEL => (),
-            VectorComputeVariableINTEL => (),
+            SideEffectsINTEL => {
+                req.add_cap(Capability::AsmINTEL);
+            }
+            VectorComputeVariableINTEL => {
+                req.add_cap(Capability::VectorComputeINTEL);
+            }
             FuncParamIOKindINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VectorComputeINTEL);
+                x0.write_word(sink, req);
             }
-            VectorComputeFunctionINTEL => (),
-            StackCallINTEL => (),
+            VectorComputeFunctionINTEL => {
+                req.add_cap(Capability::VectorComputeINTEL);
+            }
+            StackCallINTEL => {
+                req.add_cap(Capability::VectorComputeINTEL);
+            }
             GlobalVariableOffsetINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::VectorComputeINTEL);
+                x0.write_word(sink, req);
             }
             CounterBuffer(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             UserSemantic(x0) => {
-                x0.write_word(sink);
+                x0.write_word(sink, req);
             }
             UserTypeGOOGLE(x0) => {
-                x0.write_word(sink);
+                req.add_ext("SPV_GOOGLE_user_type".to_string());
+                x0.write_word(sink, req);
             }
             FunctionRoundingModeINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                req.add_cap(Capability::FunctionFloatControlINTEL);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             FunctionDenormModeINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                req.add_cap(Capability::FunctionFloatControlINTEL);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
-            RegisterINTEL => (),
+            RegisterINTEL => {
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+            }
             MemoryINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
             }
             NumbanksINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
             }
             BankwidthINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
             }
             MaxPrivateCopiesINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
             }
-            SinglepumpINTEL => (),
-            DoublepumpINTEL => (),
+            SinglepumpINTEL => {
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+            }
+            DoublepumpINTEL => {
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+            }
             MaxReplicatesINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
             }
-            SimpleDualPortINTEL => (),
+            SimpleDualPortINTEL => {
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+            }
             MergeINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
             BankBitsINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
             }
             ForcePow2DepthINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAttributesINTEL);
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+                x0.write_word(sink, req);
             }
-            BurstCoalesceINTEL => (),
+            BurstCoalesceINTEL => {
+                req.add_cap(Capability::FPGAMemoryAccessesINTEL);
+            }
             CacheSizeINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAccessesINTEL);
+                x0.write_word(sink, req);
             }
-            DontStaticallyCoalesceINTEL => (),
+            DontStaticallyCoalesceINTEL => {
+                req.add_cap(Capability::FPGAMemoryAccessesINTEL);
+            }
             PrefetchINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGAMemoryAccessesINTEL);
+                x0.write_word(sink, req);
             }
-            StallEnableINTEL => (),
-            FuseLoopsInFunctionINTEL => (),
+            StallEnableINTEL => {
+                req.add_cap(Capability::FPGAClusterAttributesINTEL);
+            }
+            FuseLoopsInFunctionINTEL => {
+                req.add_cap(Capability::LoopFuseINTEL);
+            }
             AliasScopeINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::MemoryAccessAliasingINTEL);
+                x0.write_word(sink, req);
             }
             NoAliasINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::MemoryAccessAliasingINTEL);
+                x0.write_word(sink, req);
             }
             BufferLocationINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::FPGABufferLocationINTEL);
+                x0.write_word(sink, req);
             }
             IOPipeStorageINTEL(x0) => {
-                x0.write_word(sink);
+                req.add_cap(Capability::IOPipesINTEL);
+                x0.write_word(sink, req);
             }
             FunctionFloatingPointModeINTEL(x0, x1) => {
-                x0.write_word(sink);
-                x1.write_word(sink);
+                req.add_cap(Capability::FunctionFloatControlINTEL);
+                x0.write_word(sink, req);
+                x1.write_word(sink, req);
             }
-            SingleElementVectorINTEL => (),
-            VectorComputeCallableFunctionINTEL => (),
-            MediaBlockIOINTEL => (),
+            SingleElementVectorINTEL => {
+                req.add_cap(Capability::VectorComputeINTEL);
+            }
+            VectorComputeCallableFunctionINTEL => {
+                req.add_cap(Capability::VectorComputeINTEL);
+            }
+            MediaBlockIOINTEL => {
+                req.add_cap(Capability::VectorComputeINTEL);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15601,109 +16306,405 @@ impl BuiltIn {
     }
 }
 impl Asm for BuiltIn {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use BuiltIn::*;
         match self {
-            Position => (),
-            PointSize => (),
-            ClipDistance => (),
-            CullDistance => (),
-            VertexId => (),
-            InstanceId => (),
-            PrimitiveId => (),
-            InvocationId => (),
-            Layer => (),
-            ViewportIndex => (),
-            TessLevelOuter => (),
-            TessLevelInner => (),
-            TessCoord => (),
-            PatchVertices => (),
-            FragCoord => (),
-            PointCoord => (),
-            FrontFacing => (),
-            SampleId => (),
-            SamplePosition => (),
-            SampleMask => (),
-            FragDepth => (),
-            HelperInvocation => (),
-            NumWorkgroups => (),
-            WorkgroupSize => (),
-            WorkgroupId => (),
-            LocalInvocationId => (),
-            GlobalInvocationId => (),
-            LocalInvocationIndex => (),
-            WorkDim => (),
-            GlobalSize => (),
-            EnqueuedWorkgroupSize => (),
-            GlobalOffset => (),
-            GlobalLinearId => (),
-            SubgroupSize => (),
-            SubgroupMaxSize => (),
-            NumSubgroups => (),
-            NumEnqueuedSubgroups => (),
-            SubgroupId => (),
-            SubgroupLocalInvocationId => (),
-            VertexIndex => (),
-            InstanceIndex => (),
-            SubgroupEqMask => (),
-            SubgroupGeMask => (),
-            SubgroupGtMask => (),
-            SubgroupLeMask => (),
-            SubgroupLtMask => (),
-            BaseVertex => (),
-            BaseInstance => (),
-            DrawIndex => (),
-            PrimitiveShadingRateKHR => (),
-            DeviceIndex => (),
-            ViewIndex => (),
-            ShadingRateKHR => (),
-            BaryCoordNoPerspAMD => (),
-            BaryCoordNoPerspCentroidAMD => (),
-            BaryCoordNoPerspSampleAMD => (),
-            BaryCoordSmoothAMD => (),
-            BaryCoordSmoothCentroidAMD => (),
-            BaryCoordSmoothSampleAMD => (),
-            BaryCoordPullModelAMD => (),
-            FragStencilRefEXT => (),
-            ViewportMaskNV => (),
-            SecondaryPositionNV => (),
-            SecondaryViewportMaskNV => (),
-            PositionPerViewNV => (),
-            ViewportMaskPerViewNV => (),
-            FullyCoveredEXT => (),
-            TaskCountNV => (),
-            PrimitiveCountNV => (),
-            PrimitiveIndicesNV => (),
-            ClipDistancePerViewNV => (),
-            CullDistancePerViewNV => (),
-            LayerPerViewNV => (),
-            MeshViewCountNV => (),
-            MeshViewIndicesNV => (),
-            BaryCoordKHR => (),
-            BaryCoordNoPerspKHR => (),
-            FragSizeEXT => (),
-            FragInvocationCountEXT => (),
-            LaunchIdNV => (),
-            LaunchSizeNV => (),
-            WorldRayOriginNV => (),
-            WorldRayDirectionNV => (),
-            ObjectRayOriginNV => (),
-            ObjectRayDirectionNV => (),
-            RayTminNV => (),
-            RayTmaxNV => (),
-            InstanceCustomIndexNV => (),
-            ObjectToWorldNV => (),
-            WorldToObjectNV => (),
-            HitTNV => (),
-            HitKindNV => (),
-            CurrentRayTimeNV => (),
-            IncomingRayFlagsNV => (),
-            RayGeometryIndexKHR => (),
-            WarpsPerSMNV => (),
-            SMCountNV => (),
-            WarpIDNV => (),
-            SMIDNV => (),
+            Position => {
+                req.add_cap(Capability::Shader);
+            }
+            PointSize => {
+                req.add_cap(Capability::Shader);
+            }
+            ClipDistance => {
+                req.add_cap(Capability::ClipDistance);
+            }
+            CullDistance => {
+                req.add_cap(Capability::CullDistance);
+            }
+            VertexId => {
+                req.add_cap(Capability::Shader);
+            }
+            InstanceId => {
+                req.add_cap(Capability::Shader);
+            }
+            PrimitiveId => {
+                req.add_cap(Capability::Geometry);
+                req.add_cap(Capability::Tessellation);
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_cap(Capability::MeshShadingNV);
+            }
+            InvocationId => {
+                req.add_cap(Capability::Geometry);
+                req.add_cap(Capability::Tessellation);
+            }
+            Layer => {
+                req.add_cap(Capability::Geometry);
+                req.add_cap(Capability::ShaderLayer);
+                req.add_cap(Capability::ShaderViewportIndexLayerEXT);
+                req.add_cap(Capability::MeshShadingNV);
+            }
+            ViewportIndex => {
+                req.add_cap(Capability::MultiViewport);
+                req.add_cap(Capability::ShaderViewportIndex);
+                req.add_cap(Capability::ShaderViewportIndexLayerEXT);
+                req.add_cap(Capability::MeshShadingNV);
+            }
+            TessLevelOuter => {
+                req.add_cap(Capability::Tessellation);
+            }
+            TessLevelInner => {
+                req.add_cap(Capability::Tessellation);
+            }
+            TessCoord => {
+                req.add_cap(Capability::Tessellation);
+            }
+            PatchVertices => {
+                req.add_cap(Capability::Tessellation);
+            }
+            FragCoord => {
+                req.add_cap(Capability::Shader);
+            }
+            PointCoord => {
+                req.add_cap(Capability::Shader);
+            }
+            FrontFacing => {
+                req.add_cap(Capability::Shader);
+            }
+            SampleId => {
+                req.add_cap(Capability::SampleRateShading);
+            }
+            SamplePosition => {
+                req.add_cap(Capability::SampleRateShading);
+            }
+            SampleMask => {
+                req.add_cap(Capability::Shader);
+            }
+            FragDepth => {
+                req.add_cap(Capability::Shader);
+            }
+            HelperInvocation => {
+                req.add_cap(Capability::Shader);
+            }
+            NumWorkgroups => {}
+            WorkgroupSize => {}
+            WorkgroupId => {}
+            LocalInvocationId => {}
+            GlobalInvocationId => {}
+            LocalInvocationIndex => {}
+            WorkDim => {
+                req.add_cap(Capability::Kernel);
+            }
+            GlobalSize => {
+                req.add_cap(Capability::Kernel);
+            }
+            EnqueuedWorkgroupSize => {
+                req.add_cap(Capability::Kernel);
+            }
+            GlobalOffset => {
+                req.add_cap(Capability::Kernel);
+            }
+            GlobalLinearId => {
+                req.add_cap(Capability::Kernel);
+            }
+            SubgroupSize => {
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::GroupNonUniform);
+                req.add_cap(Capability::SubgroupBallotKHR);
+            }
+            SubgroupMaxSize => {
+                req.add_cap(Capability::Kernel);
+            }
+            NumSubgroups => {
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            NumEnqueuedSubgroups => {
+                req.add_cap(Capability::Kernel);
+            }
+            SubgroupId => {
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            SubgroupLocalInvocationId => {
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::GroupNonUniform);
+                req.add_cap(Capability::SubgroupBallotKHR);
+            }
+            VertexIndex => {
+                req.add_cap(Capability::Shader);
+            }
+            InstanceIndex => {
+                req.add_cap(Capability::Shader);
+            }
+            SubgroupEqMask => {
+                req.add_cap(Capability::SubgroupBallotKHR);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            SubgroupGeMask => {
+                req.add_cap(Capability::SubgroupBallotKHR);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            SubgroupGtMask => {
+                req.add_cap(Capability::SubgroupBallotKHR);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            SubgroupLeMask => {
+                req.add_cap(Capability::SubgroupBallotKHR);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            SubgroupLtMask => {
+                req.add_cap(Capability::SubgroupBallotKHR);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            BaseVertex => {
+                req.add_cap(Capability::DrawParameters);
+                req.add_ext("SPV_KHR_shader_draw_parameters".to_string());
+            }
+            BaseInstance => {
+                req.add_cap(Capability::DrawParameters);
+                req.add_ext("SPV_KHR_shader_draw_parameters".to_string());
+            }
+            DrawIndex => {
+                req.add_cap(Capability::DrawParameters);
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_KHR_shader_draw_parameters".to_string());
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            PrimitiveShadingRateKHR => {
+                req.add_cap(Capability::FragmentShadingRateKHR);
+                req.add_ext("SPV_KHR_fragment_shading_rate".to_string());
+            }
+            DeviceIndex => {
+                req.add_cap(Capability::DeviceGroup);
+                req.add_ext("SPV_KHR_device_group".to_string());
+            }
+            ViewIndex => {
+                req.add_cap(Capability::MultiView);
+                req.add_ext("SPV_KHR_multiview".to_string());
+            }
+            ShadingRateKHR => {
+                req.add_cap(Capability::FragmentShadingRateKHR);
+                req.add_ext("SPV_KHR_fragment_shading_rate".to_string());
+            }
+            BaryCoordNoPerspAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            BaryCoordNoPerspCentroidAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            BaryCoordNoPerspSampleAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            BaryCoordSmoothAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            BaryCoordSmoothCentroidAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            BaryCoordSmoothSampleAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            BaryCoordPullModelAMD => {
+                req.add_ext("SPV_AMD_shader_explicit_vertex_parameter".to_string());
+            }
+            FragStencilRefEXT => {
+                req.add_cap(Capability::StencilExportEXT);
+                req.add_ext("SPV_EXT_shader_stencil_export".to_string());
+            }
+            ViewportMaskNV => {
+                req.add_cap(Capability::ShaderViewportMaskNV);
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_viewport_array2".to_string());
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            SecondaryPositionNV => {
+                req.add_cap(Capability::ShaderStereoViewNV);
+                req.add_ext("SPV_NV_stereo_view_rendering".to_string());
+            }
+            SecondaryViewportMaskNV => {
+                req.add_cap(Capability::ShaderStereoViewNV);
+                req.add_ext("SPV_NV_stereo_view_rendering".to_string());
+            }
+            PositionPerViewNV => {
+                req.add_cap(Capability::PerViewAttributesNV);
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NVX_multiview_per_view_attributes".to_string());
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            ViewportMaskPerViewNV => {
+                req.add_cap(Capability::PerViewAttributesNV);
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NVX_multiview_per_view_attributes".to_string());
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            FullyCoveredEXT => {
+                req.add_cap(Capability::FragmentFullyCoveredEXT);
+                req.add_ext("SPV_EXT_fragment_fully_covered".to_string());
+            }
+            TaskCountNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            PrimitiveCountNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            PrimitiveIndicesNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            ClipDistancePerViewNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            CullDistancePerViewNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            LayerPerViewNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            MeshViewCountNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            MeshViewIndicesNV => {
+                req.add_cap(Capability::MeshShadingNV);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            BaryCoordKHR => {
+                req.add_cap(Capability::FragmentBarycentricKHR);
+                req.add_cap(Capability::FragmentBarycentricKHR);
+                req.add_ext("SPV_NV_fragment_shader_barycentric".to_string());
+                req.add_ext("SPV_KHR_fragment_shader_barycentric".to_string());
+            }
+            BaryCoordNoPerspKHR => {
+                req.add_cap(Capability::FragmentBarycentricKHR);
+                req.add_cap(Capability::FragmentBarycentricKHR);
+                req.add_ext("SPV_NV_fragment_shader_barycentric".to_string());
+                req.add_ext("SPV_KHR_fragment_shader_barycentric".to_string());
+            }
+            FragSizeEXT => {
+                req.add_cap(Capability::FragmentDensityEXT);
+                req.add_cap(Capability::FragmentDensityEXT);
+                req.add_ext("SPV_EXT_fragment_invocation_density".to_string());
+                req.add_ext("SPV_NV_shading_rate".to_string());
+            }
+            FragInvocationCountEXT => {
+                req.add_cap(Capability::FragmentDensityEXT);
+                req.add_cap(Capability::FragmentDensityEXT);
+                req.add_ext("SPV_EXT_fragment_invocation_density".to_string());
+                req.add_ext("SPV_NV_shading_rate".to_string());
+            }
+            LaunchIdNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            LaunchSizeNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            WorldRayOriginNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            WorldRayDirectionNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            ObjectRayOriginNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            ObjectRayDirectionNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            RayTminNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            RayTmaxNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            InstanceCustomIndexNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            ObjectToWorldNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            WorldToObjectNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            HitTNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+            }
+            HitKindNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            CurrentRayTimeNV => {
+                req.add_cap(Capability::RayTracingMotionBlurNV);
+                req.add_ext("SPV_NV_ray_tracing_motion_blur".to_string());
+            }
+            IncomingRayFlagsNV => {
+                req.add_cap(Capability::RayTracingNV);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            RayGeometryIndexKHR => {
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            WarpsPerSMNV => {
+                req.add_cap(Capability::ShaderSMBuiltinsNV);
+                req.add_ext("SPV_NV_shader_sm_builtins".to_string());
+            }
+            SMCountNV => {
+                req.add_cap(Capability::ShaderSMBuiltinsNV);
+                req.add_ext("SPV_NV_shader_sm_builtins".to_string());
+            }
+            WarpIDNV => {
+                req.add_cap(Capability::ShaderSMBuiltinsNV);
+                req.add_ext("SPV_NV_shader_sm_builtins".to_string());
+            }
+            SMIDNV => {
+                req.add_cap(Capability::ShaderSMBuiltinsNV);
+                req.add_ext("SPV_NV_shader_sm_builtins".to_string());
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15820,17 +16821,21 @@ impl Scope {
     }
 }
 impl Asm for Scope {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use Scope::*;
         match self {
-            CrossDevice => (),
-            Device => (),
-            Workgroup => (),
-            Subgroup => (),
-            Invocation => (),
-            QueueFamily => (),
-            ShaderCallKHR => (),
+            CrossDevice => {}
+            Device => {}
+            Workgroup => {}
+            Subgroup => {}
+            Invocation => {}
+            QueueFamily => {
+                req.add_cap(Capability::VulkanMemoryModel);
+            }
+            ShaderCallKHR => {
+                req.add_cap(Capability::RayTracingKHR);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15855,17 +16860,40 @@ impl GroupOperation {
     }
 }
 impl Asm for GroupOperation {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use GroupOperation::*;
         match self {
-            Reduce => (),
-            InclusiveScan => (),
-            ExclusiveScan => (),
-            ClusteredReduce => (),
-            PartitionedReduceNV => (),
-            PartitionedInclusiveScanNV => (),
-            PartitionedExclusiveScanNV => (),
+            Reduce => {
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::GroupNonUniformArithmetic);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            InclusiveScan => {
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::GroupNonUniformArithmetic);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            ExclusiveScan => {
+                req.add_cap(Capability::Kernel);
+                req.add_cap(Capability::GroupNonUniformArithmetic);
+                req.add_cap(Capability::GroupNonUniformBallot);
+            }
+            ClusteredReduce => {
+                req.add_cap(Capability::GroupNonUniformClustered);
+            }
+            PartitionedReduceNV => {
+                req.add_cap(Capability::GroupNonUniformPartitionedNV);
+                req.add_ext("SPV_NV_shader_subgroup_partitioned".to_string());
+            }
+            PartitionedInclusiveScanNV => {
+                req.add_cap(Capability::GroupNonUniformPartitionedNV);
+                req.add_ext("SPV_NV_shader_subgroup_partitioned".to_string());
+            }
+            PartitionedExclusiveScanNV => {
+                req.add_cap(Capability::GroupNonUniformPartitionedNV);
+                req.add_ext("SPV_NV_shader_subgroup_partitioned".to_string());
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15890,13 +16918,19 @@ impl KernelEnqueueFlags {
     }
 }
 impl Asm for KernelEnqueueFlags {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use KernelEnqueueFlags::*;
         match self {
-            NoWait => (),
-            WaitKernel => (),
-            WaitWorkGroup => (),
+            NoWait => {
+                req.add_cap(Capability::Kernel);
+            }
+            WaitKernel => {
+                req.add_cap(Capability::Kernel);
+            }
+            WaitWorkGroup => {
+                req.add_cap(Capability::Kernel);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -15917,207 +16951,612 @@ impl Capability {
     }
 }
 impl Asm for Capability {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use Capability::*;
         match self {
-            Matrix => (),
-            Shader => (),
-            Geometry => (),
-            Tessellation => (),
-            Addresses => (),
-            Linkage => (),
-            Kernel => (),
-            Vector16 => (),
-            Float16Buffer => (),
-            Float16 => (),
-            Float64 => (),
-            Int64 => (),
-            Int64Atomics => (),
-            ImageBasic => (),
-            ImageReadWrite => (),
-            ImageMipmap => (),
-            Pipes => (),
-            Groups => (),
-            DeviceEnqueue => (),
-            LiteralSampler => (),
-            AtomicStorage => (),
-            Int16 => (),
-            TessellationPointSize => (),
-            GeometryPointSize => (),
-            ImageGatherExtended => (),
-            StorageImageMultisample => (),
-            UniformBufferArrayDynamicIndexing => (),
-            SampledImageArrayDynamicIndexing => (),
-            StorageBufferArrayDynamicIndexing => (),
-            StorageImageArrayDynamicIndexing => (),
-            ClipDistance => (),
-            CullDistance => (),
-            ImageCubeArray => (),
-            SampleRateShading => (),
-            ImageRect => (),
-            SampledRect => (),
-            GenericPointer => (),
-            Int8 => (),
-            InputAttachment => (),
-            SparseResidency => (),
-            MinLod => (),
-            Sampled1D => (),
-            Image1D => (),
-            SampledCubeArray => (),
-            SampledBuffer => (),
-            ImageBuffer => (),
-            ImageMSArray => (),
-            StorageImageExtendedFormats => (),
-            ImageQuery => (),
-            DerivativeControl => (),
-            InterpolationFunction => (),
-            TransformFeedback => (),
-            GeometryStreams => (),
-            StorageImageReadWithoutFormat => (),
-            StorageImageWriteWithoutFormat => (),
-            MultiViewport => (),
-            SubgroupDispatch => (),
-            NamedBarrier => (),
-            PipeStorage => (),
-            GroupNonUniform => (),
-            GroupNonUniformVote => (),
-            GroupNonUniformArithmetic => (),
-            GroupNonUniformBallot => (),
-            GroupNonUniformShuffle => (),
-            GroupNonUniformShuffleRelative => (),
-            GroupNonUniformClustered => (),
-            GroupNonUniformQuad => (),
-            ShaderLayer => (),
-            ShaderViewportIndex => (),
-            UniformDecoration => (),
-            FragmentShadingRateKHR => (),
-            SubgroupBallotKHR => (),
-            DrawParameters => (),
-            WorkgroupMemoryExplicitLayoutKHR => (),
-            WorkgroupMemoryExplicitLayout8BitAccessKHR => (),
-            WorkgroupMemoryExplicitLayout16BitAccessKHR => (),
-            SubgroupVoteKHR => (),
-            StorageBuffer16BitAccess => (),
-            UniformAndStorageBuffer16BitAccess => (),
-            StoragePushConstant16 => (),
-            StorageInputOutput16 => (),
-            DeviceGroup => (),
-            MultiView => (),
-            VariablePointersStorageBuffer => (),
-            VariablePointers => (),
-            AtomicStorageOps => (),
-            SampleMaskPostDepthCoverage => (),
-            StorageBuffer8BitAccess => (),
-            UniformAndStorageBuffer8BitAccess => (),
-            StoragePushConstant8 => (),
-            DenormPreserve => (),
-            DenormFlushToZero => (),
-            SignedZeroInfNanPreserve => (),
-            RoundingModeRTE => (),
-            RoundingModeRTZ => (),
-            RayQueryProvisionalKHR => (),
-            RayQueryKHR => (),
-            RayTraversalPrimitiveCullingKHR => (),
-            RayTracingKHR => (),
-            Float16ImageAMD => (),
-            ImageGatherBiasLodAMD => (),
-            FragmentMaskAMD => (),
-            StencilExportEXT => (),
-            ImageReadWriteLodAMD => (),
-            Int64ImageEXT => (),
-            ShaderClockKHR => (),
-            SampleMaskOverrideCoverageNV => (),
-            GeometryShaderPassthroughNV => (),
-            ShaderViewportIndexLayerEXT => (),
-            ShaderViewportMaskNV => (),
-            ShaderStereoViewNV => (),
-            PerViewAttributesNV => (),
-            FragmentFullyCoveredEXT => (),
-            MeshShadingNV => (),
-            ImageFootprintNV => (),
-            FragmentBarycentricKHR => (),
-            ComputeDerivativeGroupQuadsNV => (),
-            FragmentDensityEXT => (),
-            GroupNonUniformPartitionedNV => (),
-            ShaderNonUniform => (),
-            RuntimeDescriptorArray => (),
-            InputAttachmentArrayDynamicIndexing => (),
-            UniformTexelBufferArrayDynamicIndexing => (),
-            StorageTexelBufferArrayDynamicIndexing => (),
-            UniformBufferArrayNonUniformIndexing => (),
-            SampledImageArrayNonUniformIndexing => (),
-            StorageBufferArrayNonUniformIndexing => (),
-            StorageImageArrayNonUniformIndexing => (),
-            InputAttachmentArrayNonUniformIndexing => (),
-            UniformTexelBufferArrayNonUniformIndexing => (),
-            StorageTexelBufferArrayNonUniformIndexing => (),
-            RayTracingNV => (),
-            RayTracingMotionBlurNV => (),
-            VulkanMemoryModel => (),
-            VulkanMemoryModelDeviceScope => (),
-            PhysicalStorageBufferAddresses => (),
-            ComputeDerivativeGroupLinearNV => (),
-            RayTracingProvisionalKHR => (),
-            CooperativeMatrixNV => (),
-            FragmentShaderSampleInterlockEXT => (),
-            FragmentShaderShadingRateInterlockEXT => (),
-            ShaderSMBuiltinsNV => (),
-            FragmentShaderPixelInterlockEXT => (),
-            DemoteToHelperInvocation => (),
-            BindlessTextureNV => (),
-            SubgroupShuffleINTEL => (),
-            SubgroupBufferBlockIOINTEL => (),
-            SubgroupImageBlockIOINTEL => (),
-            SubgroupImageMediaBlockIOINTEL => (),
-            RoundToInfinityINTEL => (),
-            FloatingPointModeINTEL => (),
-            IntegerFunctions2INTEL => (),
-            FunctionPointersINTEL => (),
-            IndirectReferencesINTEL => (),
-            AsmINTEL => (),
-            AtomicFloat32MinMaxEXT => (),
-            AtomicFloat64MinMaxEXT => (),
-            AtomicFloat16MinMaxEXT => (),
-            VectorComputeINTEL => (),
-            VectorAnyINTEL => (),
-            ExpectAssumeKHR => (),
-            SubgroupAvcMotionEstimationINTEL => (),
-            SubgroupAvcMotionEstimationIntraINTEL => (),
-            SubgroupAvcMotionEstimationChromaINTEL => (),
-            VariableLengthArrayINTEL => (),
-            FunctionFloatControlINTEL => (),
-            FPGAMemoryAttributesINTEL => (),
-            FPFastMathModeINTEL => (),
-            ArbitraryPrecisionIntegersINTEL => (),
-            ArbitraryPrecisionFloatingPointINTEL => (),
-            UnstructuredLoopControlsINTEL => (),
-            FPGALoopControlsINTEL => (),
-            KernelAttributesINTEL => (),
-            FPGAKernelAttributesINTEL => (),
-            FPGAMemoryAccessesINTEL => (),
-            FPGAClusterAttributesINTEL => (),
-            LoopFuseINTEL => (),
-            MemoryAccessAliasingINTEL => (),
-            FPGABufferLocationINTEL => (),
-            ArbitraryPrecisionFixedPointINTEL => (),
-            USMStorageClassesINTEL => (),
-            IOPipesINTEL => (),
-            BlockingPipesINTEL => (),
-            FPGARegINTEL => (),
-            DotProductInputAll => (),
-            DotProductInput4x8Bit => (),
-            DotProductInput4x8BitPacked => (),
-            DotProduct => (),
-            BitInstructions => (),
-            AtomicFloat32AddEXT => (),
-            AtomicFloat64AddEXT => (),
-            LongConstantCompositeINTEL => (),
-            OptNoneINTEL => (),
-            AtomicFloat16AddEXT => (),
-            DebugInfoModuleINTEL => (),
-            SplitBarrierINTEL => (),
-            GroupUniformArithmeticKHR => (),
+            Matrix => {}
+            Shader => {
+                req.add_cap(Capability::Matrix);
+            }
+            Geometry => {
+                req.add_cap(Capability::Shader);
+            }
+            Tessellation => {
+                req.add_cap(Capability::Shader);
+            }
+            Addresses => {}
+            Linkage => {}
+            Kernel => {}
+            Vector16 => {
+                req.add_cap(Capability::Kernel);
+            }
+            Float16Buffer => {
+                req.add_cap(Capability::Kernel);
+            }
+            Float16 => {}
+            Float64 => {}
+            Int64 => {}
+            Int64Atomics => {
+                req.add_cap(Capability::Int64);
+            }
+            ImageBasic => {
+                req.add_cap(Capability::Kernel);
+            }
+            ImageReadWrite => {
+                req.add_cap(Capability::ImageBasic);
+            }
+            ImageMipmap => {
+                req.add_cap(Capability::ImageBasic);
+            }
+            Pipes => {
+                req.add_cap(Capability::Kernel);
+            }
+            Groups => {
+                req.add_ext("SPV_AMD_shader_ballot".to_string());
+            }
+            DeviceEnqueue => {
+                req.add_cap(Capability::Kernel);
+            }
+            LiteralSampler => {
+                req.add_cap(Capability::Kernel);
+            }
+            AtomicStorage => {
+                req.add_cap(Capability::Shader);
+            }
+            Int16 => {}
+            TessellationPointSize => {
+                req.add_cap(Capability::Tessellation);
+            }
+            GeometryPointSize => {
+                req.add_cap(Capability::Geometry);
+            }
+            ImageGatherExtended => {
+                req.add_cap(Capability::Shader);
+            }
+            StorageImageMultisample => {
+                req.add_cap(Capability::Shader);
+            }
+            UniformBufferArrayDynamicIndexing => {
+                req.add_cap(Capability::Shader);
+            }
+            SampledImageArrayDynamicIndexing => {
+                req.add_cap(Capability::Shader);
+            }
+            StorageBufferArrayDynamicIndexing => {
+                req.add_cap(Capability::Shader);
+            }
+            StorageImageArrayDynamicIndexing => {
+                req.add_cap(Capability::Shader);
+            }
+            ClipDistance => {
+                req.add_cap(Capability::Shader);
+            }
+            CullDistance => {
+                req.add_cap(Capability::Shader);
+            }
+            ImageCubeArray => {
+                req.add_cap(Capability::SampledCubeArray);
+            }
+            SampleRateShading => {
+                req.add_cap(Capability::Shader);
+            }
+            ImageRect => {
+                req.add_cap(Capability::SampledRect);
+            }
+            SampledRect => {
+                req.add_cap(Capability::Shader);
+            }
+            GenericPointer => {
+                req.add_cap(Capability::Addresses);
+            }
+            Int8 => {}
+            InputAttachment => {
+                req.add_cap(Capability::Shader);
+            }
+            SparseResidency => {
+                req.add_cap(Capability::Shader);
+            }
+            MinLod => {
+                req.add_cap(Capability::Shader);
+            }
+            Sampled1D => {}
+            Image1D => {
+                req.add_cap(Capability::Sampled1D);
+            }
+            SampledCubeArray => {
+                req.add_cap(Capability::Shader);
+            }
+            SampledBuffer => {}
+            ImageBuffer => {
+                req.add_cap(Capability::SampledBuffer);
+            }
+            ImageMSArray => {
+                req.add_cap(Capability::Shader);
+            }
+            StorageImageExtendedFormats => {
+                req.add_cap(Capability::Shader);
+            }
+            ImageQuery => {
+                req.add_cap(Capability::Shader);
+            }
+            DerivativeControl => {
+                req.add_cap(Capability::Shader);
+            }
+            InterpolationFunction => {
+                req.add_cap(Capability::Shader);
+            }
+            TransformFeedback => {
+                req.add_cap(Capability::Shader);
+            }
+            GeometryStreams => {
+                req.add_cap(Capability::Geometry);
+            }
+            StorageImageReadWithoutFormat => {
+                req.add_cap(Capability::Shader);
+            }
+            StorageImageWriteWithoutFormat => {
+                req.add_cap(Capability::Shader);
+            }
+            MultiViewport => {
+                req.add_cap(Capability::Geometry);
+            }
+            SubgroupDispatch => {
+                req.add_cap(Capability::DeviceEnqueue);
+            }
+            NamedBarrier => {
+                req.add_cap(Capability::Kernel);
+            }
+            PipeStorage => {
+                req.add_cap(Capability::Pipes);
+            }
+            GroupNonUniform => {}
+            GroupNonUniformVote => {
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            GroupNonUniformArithmetic => {
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            GroupNonUniformBallot => {
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            GroupNonUniformShuffle => {
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            GroupNonUniformShuffleRelative => {
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            GroupNonUniformClustered => {
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            GroupNonUniformQuad => {
+                req.add_cap(Capability::GroupNonUniform);
+            }
+            ShaderLayer => {}
+            ShaderViewportIndex => {}
+            UniformDecoration => {}
+            FragmentShadingRateKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_fragment_shading_rate".to_string());
+            }
+            SubgroupBallotKHR => {
+                req.add_ext("SPV_KHR_shader_ballot".to_string());
+            }
+            DrawParameters => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_shader_draw_parameters".to_string());
+            }
+            WorkgroupMemoryExplicitLayoutKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_workgroup_memory_explicit_layout".to_string());
+            }
+            WorkgroupMemoryExplicitLayout8BitAccessKHR => {
+                req.add_cap(Capability::WorkgroupMemoryExplicitLayoutKHR);
+                req.add_ext("SPV_KHR_workgroup_memory_explicit_layout".to_string());
+            }
+            WorkgroupMemoryExplicitLayout16BitAccessKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_workgroup_memory_explicit_layout".to_string());
+            }
+            SubgroupVoteKHR => {
+                req.add_ext("SPV_KHR_subgroup_vote".to_string());
+            }
+            StorageBuffer16BitAccess => {
+                req.add_ext("SPV_KHR_16bit_storage".to_string());
+            }
+            UniformAndStorageBuffer16BitAccess => {
+                req.add_cap(Capability::StorageBuffer16BitAccess);
+                req.add_cap(Capability::StorageBuffer16BitAccess);
+                req.add_ext("SPV_KHR_16bit_storage".to_string());
+            }
+            StoragePushConstant16 => {
+                req.add_ext("SPV_KHR_16bit_storage".to_string());
+            }
+            StorageInputOutput16 => {
+                req.add_ext("SPV_KHR_16bit_storage".to_string());
+            }
+            DeviceGroup => {
+                req.add_ext("SPV_KHR_device_group".to_string());
+            }
+            MultiView => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_multiview".to_string());
+            }
+            VariablePointersStorageBuffer => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_variable_pointers".to_string());
+            }
+            VariablePointers => {
+                req.add_cap(Capability::VariablePointersStorageBuffer);
+                req.add_ext("SPV_KHR_variable_pointers".to_string());
+            }
+            AtomicStorageOps => {
+                req.add_ext("SPV_KHR_shader_atomic_counter_ops".to_string());
+            }
+            SampleMaskPostDepthCoverage => {
+                req.add_ext("SPV_KHR_post_depth_coverage".to_string());
+            }
+            StorageBuffer8BitAccess => {
+                req.add_ext("SPV_KHR_8bit_storage".to_string());
+            }
+            UniformAndStorageBuffer8BitAccess => {
+                req.add_cap(Capability::StorageBuffer8BitAccess);
+                req.add_ext("SPV_KHR_8bit_storage".to_string());
+            }
+            StoragePushConstant8 => {
+                req.add_ext("SPV_KHR_8bit_storage".to_string());
+            }
+            DenormPreserve => {
+                req.add_ext("SPV_KHR_float_controls".to_string());
+            }
+            DenormFlushToZero => {
+                req.add_ext("SPV_KHR_float_controls".to_string());
+            }
+            SignedZeroInfNanPreserve => {
+                req.add_ext("SPV_KHR_float_controls".to_string());
+            }
+            RoundingModeRTE => {
+                req.add_ext("SPV_KHR_float_controls".to_string());
+            }
+            RoundingModeRTZ => {
+                req.add_ext("SPV_KHR_float_controls".to_string());
+            }
+            RayQueryProvisionalKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_ray_query".to_string());
+            }
+            RayQueryKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_ray_query".to_string());
+            }
+            RayTraversalPrimitiveCullingKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+                req.add_cap(Capability::RayTracingKHR);
+                req.add_ext("SPV_KHR_ray_query".to_string());
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            RayTracingKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            Float16ImageAMD => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_AMD_gpu_shader_half_float_fetch".to_string());
+            }
+            ImageGatherBiasLodAMD => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_AMD_texture_gather_bias_lod".to_string());
+            }
+            FragmentMaskAMD => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_AMD_shader_fragment_mask".to_string());
+            }
+            StencilExportEXT => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_shader_stencil_export".to_string());
+            }
+            ImageReadWriteLodAMD => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_AMD_shader_image_load_store_lod".to_string());
+            }
+            Int64ImageEXT => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_shader_image_int64".to_string());
+            }
+            ShaderClockKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_shader_clock".to_string());
+            }
+            SampleMaskOverrideCoverageNV => {
+                req.add_cap(Capability::SampleRateShading);
+                req.add_ext("SPV_NV_sample_mask_override_coverage".to_string());
+            }
+            GeometryShaderPassthroughNV => {
+                req.add_cap(Capability::Geometry);
+                req.add_ext("SPV_NV_geometry_shader_passthrough".to_string());
+            }
+            ShaderViewportIndexLayerEXT => {
+                req.add_cap(Capability::MultiViewport);
+                req.add_ext("SPV_EXT_shader_viewport_index_layer".to_string());
+            }
+            ShaderViewportMaskNV => {
+                req.add_cap(Capability::ShaderViewportIndexLayerEXT);
+                req.add_ext("SPV_NV_viewport_array2".to_string());
+            }
+            ShaderStereoViewNV => {
+                req.add_cap(Capability::ShaderViewportMaskNV);
+                req.add_ext("SPV_NV_stereo_view_rendering".to_string());
+            }
+            PerViewAttributesNV => {
+                req.add_cap(Capability::MultiView);
+                req.add_ext("SPV_NVX_multiview_per_view_attributes".to_string());
+            }
+            FragmentFullyCoveredEXT => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_fragment_fully_covered".to_string());
+            }
+            MeshShadingNV => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_NV_mesh_shader".to_string());
+            }
+            ImageFootprintNV => {
+                req.add_ext("SPV_NV_shader_image_footprint".to_string());
+            }
+            FragmentBarycentricKHR => {
+                req.add_ext("SPV_NV_fragment_shader_barycentric".to_string());
+                req.add_ext("SPV_KHR_fragment_shader_barycentric".to_string());
+            }
+            ComputeDerivativeGroupQuadsNV => {
+                req.add_ext("SPV_NV_compute_shader_derivatives".to_string());
+            }
+            FragmentDensityEXT => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_fragment_invocation_density".to_string());
+                req.add_ext("SPV_NV_shading_rate".to_string());
+            }
+            GroupNonUniformPartitionedNV => {
+                req.add_ext("SPV_NV_shader_subgroup_partitioned".to_string());
+            }
+            ShaderNonUniform => {
+                req.add_cap(Capability::Shader);
+            }
+            RuntimeDescriptorArray => {
+                req.add_cap(Capability::Shader);
+            }
+            InputAttachmentArrayDynamicIndexing => {
+                req.add_cap(Capability::InputAttachment);
+            }
+            UniformTexelBufferArrayDynamicIndexing => {
+                req.add_cap(Capability::SampledBuffer);
+            }
+            StorageTexelBufferArrayDynamicIndexing => {
+                req.add_cap(Capability::ImageBuffer);
+            }
+            UniformBufferArrayNonUniformIndexing => {
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            SampledImageArrayNonUniformIndexing => {
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            StorageBufferArrayNonUniformIndexing => {
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            StorageImageArrayNonUniformIndexing => {
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            InputAttachmentArrayNonUniformIndexing => {
+                req.add_cap(Capability::InputAttachment);
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            UniformTexelBufferArrayNonUniformIndexing => {
+                req.add_cap(Capability::SampledBuffer);
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            StorageTexelBufferArrayNonUniformIndexing => {
+                req.add_cap(Capability::ImageBuffer);
+                req.add_cap(Capability::ShaderNonUniform);
+            }
+            RayTracingNV => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_NV_ray_tracing".to_string());
+            }
+            RayTracingMotionBlurNV => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_NV_ray_tracing_motion_blur".to_string());
+            }
+            VulkanMemoryModel => {}
+            VulkanMemoryModelDeviceScope => {}
+            PhysicalStorageBufferAddresses => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_physical_storage_buffer".to_string());
+                req.add_ext("SPV_KHR_physical_storage_buffer".to_string());
+            }
+            ComputeDerivativeGroupLinearNV => {
+                req.add_ext("SPV_NV_compute_shader_derivatives".to_string());
+            }
+            RayTracingProvisionalKHR => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_KHR_ray_tracing".to_string());
+            }
+            CooperativeMatrixNV => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_NV_cooperative_matrix".to_string());
+            }
+            FragmentShaderSampleInterlockEXT => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            FragmentShaderShadingRateInterlockEXT => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            ShaderSMBuiltinsNV => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_NV_shader_sm_builtins".to_string());
+            }
+            FragmentShaderPixelInterlockEXT => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_EXT_fragment_shader_interlock".to_string());
+            }
+            DemoteToHelperInvocation => {
+                req.add_cap(Capability::Shader);
+            }
+            BindlessTextureNV => {
+                req.add_ext("SPV_NV_bindless_texture".to_string());
+            }
+            SubgroupShuffleINTEL => {
+                req.add_ext("SPV_INTEL_subgroups".to_string());
+            }
+            SubgroupBufferBlockIOINTEL => {
+                req.add_ext("SPV_INTEL_subgroups".to_string());
+            }
+            SubgroupImageBlockIOINTEL => {
+                req.add_ext("SPV_INTEL_subgroups".to_string());
+            }
+            SubgroupImageMediaBlockIOINTEL => {
+                req.add_ext("SPV_INTEL_media_block_io".to_string());
+            }
+            RoundToInfinityINTEL => {
+                req.add_ext("SPV_INTEL_float_controls2".to_string());
+            }
+            FloatingPointModeINTEL => {
+                req.add_ext("SPV_INTEL_float_controls2".to_string());
+            }
+            IntegerFunctions2INTEL => {
+                req.add_cap(Capability::Shader);
+                req.add_ext("SPV_INTEL_shader_integer_functions2".to_string());
+            }
+            FunctionPointersINTEL => {
+                req.add_ext("SPV_INTEL_function_pointers".to_string());
+            }
+            IndirectReferencesINTEL => {
+                req.add_ext("SPV_INTEL_function_pointers".to_string());
+            }
+            AsmINTEL => {
+                req.add_ext("SPV_INTEL_inline_assembly".to_string());
+            }
+            AtomicFloat32MinMaxEXT => {
+                req.add_ext("SPV_EXT_shader_atomic_float_min_max".to_string());
+            }
+            AtomicFloat64MinMaxEXT => {
+                req.add_ext("SPV_EXT_shader_atomic_float_min_max".to_string());
+            }
+            AtomicFloat16MinMaxEXT => {
+                req.add_ext("SPV_EXT_shader_atomic_float_min_max".to_string());
+            }
+            VectorComputeINTEL => {
+                req.add_cap(Capability::VectorAnyINTEL);
+                req.add_ext("SPV_INTEL_vector_compute".to_string());
+            }
+            VectorAnyINTEL => {
+                req.add_ext("SPV_INTEL_vector_compute".to_string());
+            }
+            ExpectAssumeKHR => {
+                req.add_ext("SPV_KHR_expect_assume".to_string());
+            }
+            SubgroupAvcMotionEstimationINTEL => {
+                req.add_ext("SPV_INTEL_device_side_avc_motion_estimation".to_string());
+            }
+            SubgroupAvcMotionEstimationIntraINTEL => {
+                req.add_ext("SPV_INTEL_device_side_avc_motion_estimation".to_string());
+            }
+            SubgroupAvcMotionEstimationChromaINTEL => {
+                req.add_ext("SPV_INTEL_device_side_avc_motion_estimation".to_string());
+            }
+            VariableLengthArrayINTEL => {
+                req.add_ext("SPV_INTEL_variable_length_array".to_string());
+            }
+            FunctionFloatControlINTEL => {
+                req.add_ext("SPV_INTEL_float_controls2".to_string());
+            }
+            FPGAMemoryAttributesINTEL => {
+                req.add_ext("SPV_INTEL_fpga_memory_attributes".to_string());
+            }
+            FPFastMathModeINTEL => {
+                req.add_cap(Capability::Kernel);
+                req.add_ext("SPV_INTEL_fp_fast_math_mode".to_string());
+            }
+            ArbitraryPrecisionIntegersINTEL => {
+                req.add_ext("SPV_INTEL_arbitrary_precision_integers".to_string());
+            }
+            ArbitraryPrecisionFloatingPointINTEL => {
+                req.add_ext("SPV_INTEL_arbitrary_precision_floating_point".to_string());
+            }
+            UnstructuredLoopControlsINTEL => {
+                req.add_ext("SPV_INTEL_unstructured_loop_controls".to_string());
+            }
+            FPGALoopControlsINTEL => {
+                req.add_ext("SPV_INTEL_fpga_loop_controls".to_string());
+            }
+            KernelAttributesINTEL => {
+                req.add_ext("SPV_INTEL_kernel_attributes".to_string());
+            }
+            FPGAKernelAttributesINTEL => {
+                req.add_ext("SPV_INTEL_kernel_attributes".to_string());
+            }
+            FPGAMemoryAccessesINTEL => {
+                req.add_ext("SPV_INTEL_fpga_memory_accesses".to_string());
+            }
+            FPGAClusterAttributesINTEL => {
+                req.add_ext("SPV_INTEL_fpga_cluster_attributes".to_string());
+            }
+            LoopFuseINTEL => {
+                req.add_ext("SPV_INTEL_loop_fuse".to_string());
+            }
+            MemoryAccessAliasingINTEL => {
+                req.add_ext("SPV_INTEL_memory_access_aliasing".to_string());
+            }
+            FPGABufferLocationINTEL => {
+                req.add_ext("SPV_INTEL_fpga_buffer_location".to_string());
+            }
+            ArbitraryPrecisionFixedPointINTEL => {
+                req.add_ext("SPV_INTEL_arbitrary_precision_fixed_point".to_string());
+            }
+            USMStorageClassesINTEL => {
+                req.add_ext("SPV_INTEL_usm_storage_classes".to_string());
+            }
+            IOPipesINTEL => {
+                req.add_ext("SPV_INTEL_io_pipes".to_string());
+            }
+            BlockingPipesINTEL => {
+                req.add_ext("SPV_INTEL_blocking_pipes".to_string());
+            }
+            FPGARegINTEL => {
+                req.add_ext("SPV_INTEL_fpga_reg".to_string());
+            }
+            DotProductInputAll => {}
+            DotProductInput4x8Bit => {
+                req.add_cap(Capability::Int8);
+            }
+            DotProductInput4x8BitPacked => {}
+            DotProduct => {}
+            BitInstructions => {
+                req.add_ext("SPV_KHR_bit_instructions".to_string());
+            }
+            AtomicFloat32AddEXT => {
+                req.add_ext("SPV_EXT_shader_atomic_float_add".to_string());
+            }
+            AtomicFloat64AddEXT => {
+                req.add_ext("SPV_EXT_shader_atomic_float_add".to_string());
+            }
+            LongConstantCompositeINTEL => {
+                req.add_ext("SPV_INTEL_long_constant_composite".to_string());
+            }
+            OptNoneINTEL => {
+                req.add_ext("SPV_INTEL_optnone".to_string());
+            }
+            AtomicFloat16AddEXT => {
+                req.add_ext("SPV_EXT_shader_atomic_float16_add".to_string());
+            }
+            DebugInfoModuleINTEL => {
+                req.add_ext("SPV_INTEL_debug_module".to_string());
+            }
+            SplitBarrierINTEL => {
+                req.add_ext("SPV_INTEL_split_barrier".to_string());
+            }
+            GroupUniformArithmeticKHR => {
+                req.add_ext("SPV_KHR_uniform_group_instructions".to_string());
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -16332,12 +17771,16 @@ impl RayQueryIntersection {
     }
 }
 impl Asm for RayQueryIntersection {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use RayQueryIntersection::*;
         match self {
-            RayQueryCandidateIntersectionKHR => (),
-            RayQueryCommittedIntersectionKHR => (),
+            RayQueryCandidateIntersectionKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+            }
+            RayQueryCommittedIntersectionKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -16357,13 +17800,19 @@ impl RayQueryCommittedIntersectionType {
     }
 }
 impl Asm for RayQueryCommittedIntersectionType {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use RayQueryCommittedIntersectionType::*;
         match self {
-            RayQueryCommittedIntersectionNoneKHR => (),
-            RayQueryCommittedIntersectionTriangleKHR => (),
-            RayQueryCommittedIntersectionGeneratedKHR => (),
+            RayQueryCommittedIntersectionNoneKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+            }
+            RayQueryCommittedIntersectionTriangleKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+            }
+            RayQueryCommittedIntersectionGeneratedKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -16384,12 +17833,16 @@ impl RayQueryCandidateIntersectionType {
     }
 }
 impl Asm for RayQueryCandidateIntersectionType {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use RayQueryCandidateIntersectionType::*;
         match self {
-            RayQueryCandidateIntersectionTriangleKHR => (),
-            RayQueryCandidateIntersectionAABBKHR => (),
+            RayQueryCandidateIntersectionTriangleKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+            }
+            RayQueryCandidateIntersectionAABBKHR => {
+                req.add_cap(Capability::RayQueryKHR);
+            }
             what => panic!("{:?}", what),
         }
     }
@@ -16409,11 +17862,11 @@ impl PackedVectorFormat {
     }
 }
 impl Asm for PackedVectorFormat {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.opcode());
         use PackedVectorFormat::*;
         match self {
-            PackedVectorFormat4x8Bit => (),
+            PackedVectorFormat4x8Bit => {}
             what => panic!("{:?}", what),
         }
     }
@@ -16426,9 +17879,22 @@ impl Asm for PackedVectorFormat {
         }
     }
 }
+#[derive(Debug, Default, Clone)]
+pub struct ModuleRequirements {
+    pub cap: std::collections::HashSet<Capability>,
+    pub ext: std::collections::HashSet<String>,
+}
+impl ModuleRequirements {
+    pub fn add_cap(&mut self, cap: Capability) {
+        self.cap.insert(cap);
+    }
+    pub fn add_ext(&mut self, ext: String) {
+        self.ext.insert(ext);
+    }
+}
 impl<T: Asm> Asm for Option<T> {
-    fn write_word(&self, sink: &mut Vec<u32>) {
-        self.as_ref().map(|t| t.write_word(sink));
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+        self.as_ref().map(|t| t.write_word(sink, req));
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
         if *idx < chunk.len() {
@@ -16439,9 +17905,9 @@ impl<T: Asm> Asm for Option<T> {
     }
 }
 impl<T: Asm, U: Asm> Asm for (T, U) {
-    fn write_word(&self, sink: &mut Vec<u32>) {
-        self.0.write_word(sink);
-        self.1.write_word(sink);
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+        self.0.write_word(sink, req);
+        self.1.write_word(sink, req);
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
         let t = T::read_word(chunk, idx);
@@ -16450,16 +17916,16 @@ impl<T: Asm, U: Asm> Asm for (T, U) {
     }
 }
 impl<T: Asm> Asm for Box<T> {
-    fn write_word(&self, sink: &mut Vec<u32>) {
-        self.as_ref().write_word(sink);
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+        self.as_ref().write_word(sink, req);
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
         Box::new(T::read_word(chunk, idx))
     }
 }
 impl<T: Asm> Asm for Vec<T> {
-    fn write_word(&self, sink: &mut Vec<u32>) {
-        self.iter().for_each(|t| t.write_word(sink));
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
+        self.iter().for_each(|t| t.write_word(sink, req));
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
         let mut re = vec![];
@@ -16470,7 +17936,7 @@ impl<T: Asm> Asm for Vec<T> {
     }
 }
 impl Asm for u32 {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(*self);
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {
@@ -16479,7 +17945,7 @@ impl Asm for u32 {
     }
 }
 impl Asm for String {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         let mark = sink.len();
         let strlen = (self.len() >> 2) + 1;
         sink.resize(mark + strlen, 0);
@@ -16511,7 +17977,7 @@ impl Asm for String {
     }
 }
 impl Asm for ID {
-    fn write_word(&self, sink: &mut Vec<u32>) {
+    fn write_word(&self, sink: &mut Vec<u32>, req: &mut ModuleRequirements) {
         sink.push(self.0);
     }
     fn read_word(chunk: &[u32], idx: &mut usize) -> Self {

@@ -1,0 +1,38 @@
+#version 450
+
+// Allows buffer_reference.
+#extension GL_EXT_buffer_reference : require
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+
+layout(binding = 0) readonly buffer Block {
+   vec2 positions[];
+};
+
+layout(binding = 1) writeonly buffer Block2 {
+   vec2 out_positions[];
+};
+
+layout(binding = 2) buffer Block3 {
+   vec2 rw_positions[];
+};
+
+layout(binding = 4) uniform Block4 {
+   vec2 rw_positions2[];
+};
+
+
+layout(binding = 3, rgba8) uniform writeonly image2D src;
+
+layout(push_constant) uniform PushConstants {
+  vec2 pc1;
+  vec2 pc2;
+  vec2 pc3;
+};
+
+void main()
+{
+  out_positions[0] = positions[0] + rw_positions[0] + pc1;
+  rw_positions[0] = positions[0] + positions[1] + pc2;
+}

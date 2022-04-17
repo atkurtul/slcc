@@ -1,12 +1,15 @@
 
-kernel [1,1,1]
-fn main(input_image: image2d, size: int) -> (output_image: image2d)
+kernel fn main(input_image: image2d, size: int) -> (
+      output_image: image2d, 
+      output_buffer1: [float2],
+      output_buffer2: [float2],
+      output_buffer3: [float2],
+      output_buffer4: [float2]
+    )
 { 
-    int2 image_size  = get_image_size(input_image);
-    int width = image_size.x;
-    int height = image_size.y;
+    int2 image_size  = input_image.size;
 
-    uint2 coord = uint2(get_global_id(0), get_global_id(1));
+    uint3 coord = get_global_id();
 
     float4 sum  = 0;
     uint   num  = 0;

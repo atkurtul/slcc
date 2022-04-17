@@ -7,19 +7,29 @@
     unused_parens
 )]
 
-pub type Map<K, V> = fxhash::FxHashMap<K, V>;
-pub type Set<K> = fxhash::FxHashSet<K>;
+use clap::Parser;
+use std::env;
 
 mod test_asm;
 mod tests;
 
+pub mod context;
 pub mod expr;
+pub mod function;
 pub mod lang;
+pub mod module;
 pub mod opcode;
+pub mod types;
+pub mod util;
 
-use std::env;
-
-use clap::Parser;
+use context::*;
+use expr::*;
+use function::*;
+use lang::*;
+use module::*;
+use opcode::*;
+use types::*;
+use util::*;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -34,18 +44,11 @@ struct Args {
     output: String,
 }
 
-
 fn main() {
     let args = Args::parse();
     let parser = lang::xLangParser::new();
     let src = std::fs::read_to_string(&args.file).unwrap();
-    let ast = parser.parse(&src).unwrap();
-    let mut ctx = expr::Context::new();
-
-    for (kernel, name, args, out, stats) in ast {
-        ctx.create_func(kernel.unwrap_or((1, 1, 1)), name, args, out, stats);
-    }
-
-    let module = ctx.into_module();
-    slcc::write_spirv(&args.output, &*module.src);
+    let mut ctx = Context::default();
+    let ast = parser.parse(&mut ctx, &src).unwrap();
+    ctx.go();
 }
